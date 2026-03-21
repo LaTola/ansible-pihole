@@ -1,0 +1,8 @@
+---
+
+- name: Restart DNS and Cache Stack
+  hosts: raspberrypi
+  gather_facts: false
+
+  roles:
+    - role: restart_stack

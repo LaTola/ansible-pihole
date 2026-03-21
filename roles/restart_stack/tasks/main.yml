@@ -1,0 +1,22 @@
+---
+
+- name: Restart DNS and Cache Stack
+  become: true
+  block:
+    - name: Stop services in order
+      ansible.builtin.include_tasks: roles/common/tasks/manage_stack.yml
+      vars:
+        action_type: "stop"
+        stack_order:
+          - { name: "pihole-FTL", state: "stopped" }
+          - { name: "unbound", state: "stopped" }
+          - { name: "valkey-server", state: "stopped" }
+
+    - name: Start services in order
+      ansible.builtin.include_tasks: roles/common/tasks/manage_stack.yml
+      vars:
+        action_type: "start"
+        stack_order:
+          - { name: "valkey-server", state: "started" }
+          - { name: "unbound", state: "started" }
+          - { name: "pihole-FTL", state: "started" }

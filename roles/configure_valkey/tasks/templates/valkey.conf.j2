@@ -1,0 +1,34 @@
+# Basic settings
+port {{ valkey_port }}
+
+# Unix socket settings
+unixsocket {{ valkey_unixsocket }}
+unixsocketgroup {{ valkey_group }}
+unixsocketperm 770
+
+# Memory settings for RPi
+maxmemory {{ valkey_max_memory }}
+maxmemory-policy allkeys-lru
+
+# Disable protected mode since we're only using Unix socket
+protected-mode no
+
+# Optional: disable if you don't need these features
+activedefrag no
+lazyfree-lazy-expire yes
+lazyfree-lazy-server-del yes
+
+# Save the DB every 60 seconds if at least 100 keys change
+save 60 100
+# Save every 5 minutes if at least 10 keys change
+save 300 10
+# Save every hour if at least 1 key changes
+save 3600 1
+
+# RDB persistence
+dbfilename {{ valkey_dbfilename }}
+dir {{ valkey_db_dir }}
+appendonly no
+
+# Disable transparent huge pages warning (common on Pi)
+disable-thp yes

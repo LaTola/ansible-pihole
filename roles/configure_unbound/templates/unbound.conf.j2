@@ -1,0 +1,25 @@
+# Minimal working Unbound configuration
+
+server:
+    # Listen on localhost only
+    interface: 127.0.0.1
+    port: 5335
+    access-control: 127.0.0.1 allow
+    
+    # DNS settings
+    do-ip4: yes
+    do-ip6: yes
+    do-udp: yes
+    do-tcp: yes
+    
+    # Cache settings
+    cache-min-ttl: 3600
+    cache-max-ttl: 86400
+    prefetch: yes
+    
+    # Logging
+    verbosity: 2
+    use-syslog: yes
+
+# Include additional config files
+include: "{{ unbound_config_dir }}/unbound.conf.d/*.conf"

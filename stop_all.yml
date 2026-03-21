@@ -1,0 +1,20 @@
+---
+
+- name: Stop all DNS services
+  hosts: raspberrypi
+  gather_facts: false
+
+  vars:
+    service_state: stopped
+    service_action: stopping
+
+  roles:
+    - role: common
+      vars:
+        service_name: pihole-FTL
+    - role: common
+      vars:
+        service_name: unbound
+    - role: common
+      vars:
+        service_name: valkey-server

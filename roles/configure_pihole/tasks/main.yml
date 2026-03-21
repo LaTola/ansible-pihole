@@ -1,0 +1,14 @@
+---
+
+- name: Copy pihole-FTL service override configuration files
+  become: true
+  become_method: sudo
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ systemd_unit_dir }}/pihole-FTL.service.d/{{ item | basename }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_fileglob:
+    - "files/pihole-FTL.service.d/*.conf"
+  handler: restart pihole-FTL

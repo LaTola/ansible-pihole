@@ -1,0 +1,13 @@
+---
+
+- name: Configure unbound Server
+  hosts: raspberrypi
+  gather_facts: false
+
+  handlers:
+    - name: Import global handlers
+      ansible.builtin.import_tasks: roles/common/handlers/main.yml
+
+  roles:
+    - role: configure_unbound
+    - role: restart_stack

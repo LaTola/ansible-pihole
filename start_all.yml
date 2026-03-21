@@ -1,0 +1,22 @@
+---
+
+- name: Start all DNS services
+  hosts: raspberrypi
+  gather_facts: false
+
+  vars:
+    service_state: started
+    service_action: starting
+    
+  roles:
+    - role: common
+      vars:
+        service_name: valkey-server
+    - role: common
+      vars:
+        service_name: unbound
+    - role: common
+      vars:
+        service_name: pihole-FTL
+
+

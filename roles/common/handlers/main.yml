@@ -1,0 +1,25 @@
+---
+
+- name: restart valkey
+  ansible.builtin.include_tasks: ../tasks/manage_service.yml
+  vars:
+    service_name: valkey-server
+    service_state: restarted
+    service_action: restart
+    service_daemon_reload: true
+
+- name: restart unbound
+  ansible.builtin.include_tasks: ../tasks/manage_service.yml
+  vars:
+    service_name: unbound
+    service_state: restarted
+    service_action: restart
+    service_daemon_reload: true
+
+- name: restart pihole-FTL
+  ansible.builtin.include_tasks: ../tasks/manage_service.yml
+  vars:
+    service_name: pihole-FTL
+    service_state: restarted
+    service_action: restart
+    service_daemon_reload: true
