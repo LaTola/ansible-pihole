@@ -11,14 +11,18 @@ server:
     do-ip6: yes
     do-udp: yes
     do-tcp: yes
+
+    qname-minimisation: yes
+    harden-glue: yes
     
     # Cache settings
     cache-min-ttl: 3600
     cache-max-ttl: 86400
-    prefetch: yes
+    prefetch: yes               # Refresca registros populares antes de que expiren
+    prefetch-key: no            # Ponlo en 'no' ya que no usas DNSSEC
     
     # Logging
-    verbosity: 2
+    verbosity: 1
     use-syslog: yes
 
 # Include additional config files
