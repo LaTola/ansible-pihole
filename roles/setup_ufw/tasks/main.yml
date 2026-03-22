@@ -1,0 +1,28 @@
+---
+- name: Configure UFW Firewall
+  become: true
+  become_method: ansible.builtin.sudo
+  block:
+    - name: Ensure UFW is installed
+      ansible.builtin.package:
+        name: ufw
+        state: present
+
+    - name: Configure ufw firewall rules
+      ansible.builtin.include_tasks: roles/common/tasks/ufw.yml
+      loop: "{{ ufw_rules }}"
+      loop_control:
+        loop_var: ufw_item
+      vars:
+        ufw_rules:
+          - { name: "Allow LAN SSH", port: 22, proto: "tcp", src: "{{ lan_network }}", rule: "allow" }
+          - { name: "Allow DNS from local network", port: 53, src: "{{ lan_network }}", rule: "allow" } # Removed proto to allow both TCP/UDP
+          - { name: "Allow Pi-hole Web Dashboard", port: 80, proto: "tcp", src: "{{ lan_network }}", rule: "allow" }
+          - { name: "Allow loopback in", interface: "lo", direction: "in", rule: "allow" }
+          - { name: "Allow loopback out", interface: "lo", direction: "out", rule: "allow" }
+          - { name: "Default deny incoming", direction: "in", rule: "deny" }
+          - { name: "Default allow outgoing", direction: "out", rule: "allow" }
+
+    - name: Ensure UFW is enabled
+      community.general.ufw:
+        state: enabled
