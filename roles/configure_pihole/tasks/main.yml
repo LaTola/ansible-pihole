@@ -3,7 +3,7 @@
 - name: Configure pi-hole
   become: true
   become_method: ansible.builtin.sudo
-  notify: restart pihole-FTL
+  notify: Restart pihole-FTL
   block:
     - name: Copy pihole-FTL service override configuration files
       ansible.builtin.copy:

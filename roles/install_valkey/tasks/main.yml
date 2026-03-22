@@ -16,7 +16,7 @@
     state: present
     update_cache: true
   when: valkey_check.rc != 0
-  notify: restart valkey
+  notify: Restart valkey
 
 - name: Ensure valkey-server is enabled
   ansible.builtin.service:

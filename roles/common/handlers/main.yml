@@ -1,6 +1,7 @@
 ---
+## DO NOT Change the handlers order because it will impact the order services get restarted
 
-- name: restart valkey
+- name: Restart valkey
   ansible.builtin.include_tasks: ../tasks/manage_service.yml
   vars:
     service_name: valkey-server
@@ -8,7 +9,7 @@
     service_action: restart
     service_daemon_reload: true
 
-- name: restart unbound
+- name: Restart unbound
   ansible.builtin.include_tasks: ../tasks/manage_service.yml
   vars:
     service_name: unbound
@@ -16,7 +17,7 @@
     service_action: restart
     service_daemon_reload: true
 
-- name: restart pihole-FTL
+- name: Restart pihole-FTL
   ansible.builtin.include_tasks: ../tasks/manage_service.yml
   vars:
     service_name: pihole-FTL

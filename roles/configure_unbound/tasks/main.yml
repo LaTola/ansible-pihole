@@ -3,6 +3,9 @@
 - name: Configure unbound
   become: true
   become_method: ansible.builtin.sudo
+  notify:
+    - Restart unbound
+    - Restart pihole-FTL
   block:
     - name: Upload unbound.conf file
       ansible.builtin.template:
@@ -16,7 +19,6 @@
       ansible.builtin.get_url:
         url: https://www.internic.net/domain/named.cache
         dest: "{{ unbound_config_dir }}/root.hints"
-        checksum: sha256:https://www.internic.net/domain/named.cache.sha256
         owner: "{{ unbound_user }}"
         group: "{{ unbound_group }}"
         mode: '0644'
@@ -43,6 +45,6 @@
 
     - name: Add user unbound to group valkey
       ansible.builtin.user:
-        name: unbound
-        groups: valkey
-        append: yes
+        name: "{{ unbound_user }}"
+        groups: "{{ valkey_group }}"
+        append: true

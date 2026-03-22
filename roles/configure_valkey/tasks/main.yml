@@ -21,4 +21,4 @@
       mode: "0644"
     with_fileglob:
       - "files/valkey-server.service.d/*.conf"
-  notify: restart valkey
+  notify: Restart valkey
