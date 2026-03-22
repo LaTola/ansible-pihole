@@ -3,6 +3,10 @@
 - name: Configure Valkey Cache
   become: true
   become_method: ansible.builtin.sudo
+  notify:
+    - Restart valkey
+    - Restart unbound
+    - Restart pihole-FTL
   block:
   - name: Configure Valkey
     ansible.builtin.template:
@@ -15,10 +19,9 @@
   - name: Upload valkey systemd configuration files
     ansible.builtin.copy:
       src: "{{ item }}"
-      dest: "{{systemd_unit_dir}}/valkey-server.service.d/{{ item | basename }}"
+      dest: "{{ systemd_unit_dir }}/valkey-server.service.d/{{ item | basename }}"
       owner: root
       group: root
       mode: "0644"
     with_fileglob:
       - "files/valkey-server.service.d/*.conf"
-  notify: Restart valkey
