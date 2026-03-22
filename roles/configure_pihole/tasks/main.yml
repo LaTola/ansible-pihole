@@ -16,16 +16,16 @@
     - name: Copy pihole teleporter file
       ansible.builtin.copy:
         src: "files/{{ pihole_teleporter_filename }}"
-        dest: "/tmp/{{ pihole_teleporter_filename }}"
+        dest: "{{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
         mode: "0644"
 
     - name: Import pihole teleporter file
       ansible.builtin.command:
-        cmd: "pihole-FTL --teleporter /tmp/{{ pihole_teleporter_filename }}"
+        cmd: "pihole-FTL --teleporter {{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
       register: pihole_import
       changed_when: pihole_import.rc != 0 # <- Uses the return code to define when the task has changed.
 
     - name: Remove pihole teleporter file
       ansible.builtin.file:
-        path: "/tmp/{{ pihole_teleporter_filename }}"
+        path: "{{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
         state: absent

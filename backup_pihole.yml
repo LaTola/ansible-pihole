@@ -1,0 +1,8 @@
+---
+
+- name: Backup pi-hole configuration
+  hosts: raspberrypi
+  gather_facts: false
+
+  roles:
+    - role: get_pihole_backup
