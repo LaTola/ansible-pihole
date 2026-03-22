@@ -2,7 +2,7 @@
 
 - name: Configure unbound
   become: true
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   block:
     - name: Upload unbound.conf file
       ansible.builtin.template:
@@ -40,3 +40,9 @@
         mode: "0644"
       with_fileglob:
         - "files/unbound.service.d/*.conf"
+
+    - name: Add user unbound to group valkey
+      ansible.builtin.user:
+        name: unbound
+        groups: valkey
+        append: yes
