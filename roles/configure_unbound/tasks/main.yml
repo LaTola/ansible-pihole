@@ -15,7 +15,7 @@
         group: "{{ unbound_group }}"
         mode: "0644"
 
-    - name: Download root.hints only if older than 30 days
+    - name: Download root.hints file
       ansible.builtin.get_url:
         url: https://www.internic.net/domain/named.cache
         dest: "{{ unbound_config_dir }}/root.hints"
