@@ -1,0 +1,7 @@
+---
+- name: Configure UFW Firewall
+  hosts: raspberrypi
+  gather_facts: false
+
+  roles:
+    - role: setup_ufw

@@ -1,0 +1,14 @@
+---
+
+- name: "UFW Rule: {{ ufw_item.name }}"
+  become: true
+  become_method: ansible.builtin.sudo
+  community.general.ufw:
+    rule: "{{ ufw_item.rule | default('allow') }}"
+    port: "{{ ufw_item.port | default(omit) }}"
+    proto: "{{ ufw_item.proto | default(omit) }}"
+    src: "{{ ufw_item.src | default(omit) }}"
+    interface: "{{ ufw_item.interface | default(omit) }}"
+    direction: "{{ ufw_item.direction | default(omit) }}"
+    comment: "{{ ufw_item.name }}"
+    state: enabled # This ensures the firewall stays ON while applying rules
