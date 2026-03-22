@@ -1,5 +1,4 @@
 ---
-
 - name: Stop all DNS services
   hosts: raspberrypi
   gather_facts: false
