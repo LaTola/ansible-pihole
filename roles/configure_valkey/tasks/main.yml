@@ -2,7 +2,7 @@
 
 - name: Configure Valkey Cache
   become: true
-  become_method: sudo
+  become_method: ansible.builtin.sudo
   block:
   - name: Configure Valkey
     ansible.builtin.template:
