@@ -1,24 +1,30 @@
 ---
-# tasks/main.yml - Install valkey-server on ARMv6 Raspberry Pi
-
 - name: Check if valkey-server is already installed
   ansible.builtin.command: dpkg-query -W valkey-server
   register: valkey_check
   failed_when: false
   changed_when: false
 
-- name: Install required dependencies for ARMv6
-  ansible.builtin.apt:
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - valkey-server
-    state: present
-    update_cache: true
-  when: valkey_check.rc != 0
-  notify: Restart valkey
+- name: Valkey service installation status
+  ansible.builtin.debug:
+    msg: "Valkey-server is already installed."
+  when: valkey_check.rc == 0
 
-- name: Ensure valkey-server is enabled
-  ansible.builtin.service:
-    name: valkey-server
-    enabled: true
+- name: install valkey-server
+  become: true
+  become_method: ansible.builtin.sudo
+  when: valkey_check.rc != 0
+  block:
+    - name: Install required dependencies for ARMv6
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - valkey-server
+        state: present
+        update_cache: true
+
+    - name: Ensure valkey-server is enabled
+      ansible.builtin.service:
+        name: valkey-server
+        enabled: true

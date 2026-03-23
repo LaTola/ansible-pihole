@@ -1,5 +1,4 @@
 ---
-
 - name: Check if Unbound is already installed
   ansible.builtin.command: dpkg-query -W unbound
   register: unbound_installed
@@ -14,6 +13,7 @@
 - name: Install Unbound and dependencies
   when: unbound_installed.rc != 0
   become: true
+  become_method: ansible.builtin.sudo
   block:
     - name: Update apt cache (if needed)
       ansible.builtin.apt:
@@ -29,29 +29,14 @@
 
     - name: Create Unbound configuration directory (if not exists)
       ansible.builtin.file:
-        path: {{ unbound_daemon_config_dir | default('/etc/unbound/unbound.conf.d') }}
+        path: "{{ unbound_daemon_config_dir | default('/etc/unbound/unbound.conf.d') }}"
         state: directory
         owner: "{{ unbound_user }}"
         group: "{{ unbound_group }}"
         mode: "0755"
-
-    - name: Check if default configuration exists
-      ansible.builtin.stat:
-        path: /etc/unbound/unbound.conf
-      register: unbound_default_conf
 
     - name: Enable Unbound service (if not already enabled)
       ansible.builtin.systemd:
         name: unbound
         enabled: true
         daemon_reload: true
-
-    - name: Validate Unbound configuration
-      ansible.builtin.command: unbound-checkconf
-      become: true
-      register: unbound_validation
-      changed_when: false
-      failed_when: unbound_validation.rc != 0
-      listen: "validate unbound config"
-
- 
