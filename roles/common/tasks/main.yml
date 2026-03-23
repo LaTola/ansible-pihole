@@ -1,5 +1,4 @@
 ---
-# This file simply includes other task files
 - name: Include service management tasks
   ansible.builtin.include_tasks: manage_service.yml
   # You can add a conditional so it only runs when variables are provided

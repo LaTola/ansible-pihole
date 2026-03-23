@@ -1,4 +1,4 @@
-# roles/common/tasks/manage_service.yml
+---
 - name: "{{ service_action | capitalize }} service {{ service_name }}"
   become: true
   become_method: ansible.builtin.sudo

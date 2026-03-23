@@ -1,5 +1,5 @@
 ---
-# This file handles ordered service management
+# This file handles service management
 - name: "Perform {{ action_type }} operation on DNS stack"
   ansible.builtin.service:
     name: "{{ item.name }}"
