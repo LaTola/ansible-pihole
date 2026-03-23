@@ -1,0 +1,50 @@
+---
+
+- name: Check if pihole-FTL is already installed
+  ansible.builtin.command: dpkg-query -W pihole-FTL
+  register: pihole_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Pi-hole on ARMv6 Debian system
+  become: true
+  become_method: ansible.builtin.sudo
+  when: pihole_check.rc != 0
+  block:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install prerequisite packages
+      ansible.builtin.apt:
+        name:
+          - curl
+          - git
+          - netcat-openbsd
+        state: present
+
+    - name: Download the Pi-hole automated installer
+      ansible.builtin.get_url:
+        url: https://install.pi-hole.net
+        dest: /tmp/pi-hole-installer.sh
+        mode: '0755'
+
+    - name: Run the Pi-hole installer in non-interactive mode
+      ansible.builtin.shell: |
+        /tmp/pi-hole-installer.sh \
+          --unattended \
+          --web-password "{{ pihole_default_webpassword }}"
+      args:
+        creates: /etc/pihole/setupVars.conf # Only run if Pi-hole isn't already installed
+
+    - name: Ensure the pihole-FTL service is running and enabled
+      ansible.builtin.systemd:
+        name: pihole-FTL
+        state: started
+        enabled: yes
+    
+    - name: Clean up installer script
+      ansible.builtin.file:
+        path: /tmp/pi-hole-installer.sh
+        state: absent
