@@ -1,8 +1,0 @@
----
-
-- name: Configure Valkey Server
-  hosts: raspberrypi
-  gather_facts: false
-
-  roles:
-    - role: configure_valkey

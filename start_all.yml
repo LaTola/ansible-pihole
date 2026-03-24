@@ -10,9 +10,6 @@
   roles:
     - role: common
       vars:
-        service_name: valkey-server
-    - role: common
-      vars:
         service_name: unbound
     - role: common
       vars:

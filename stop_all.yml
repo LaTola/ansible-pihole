@@ -14,6 +14,3 @@
     - role: common
       vars:
         service_name: unbound
-    - role: common
-      vars:
-        service_name: valkey-server

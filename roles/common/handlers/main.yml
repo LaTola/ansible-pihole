@@ -1,14 +1,6 @@
 ---
 ## DO NOT Change the handlers order because it will impact the order services get restarted
 
-- name: Restart valkey
-  ansible.builtin.include_tasks: ../tasks/manage_service.yml
-  vars:
-    service_name: valkey-server
-    service_state: restarted
-    service_action: restart
-    service_daemon_reload: true
-
 - name: Restart unbound
   ansible.builtin.include_tasks: ../tasks/manage_service.yml
   vars:

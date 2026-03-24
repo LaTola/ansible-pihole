@@ -12,14 +12,12 @@ Ansible playbooks to automate the setup and configuration of a Raspberry Pi as a
 ```
 Pi-hole (ad-blocking DNS)
     └──> Unbound (recursive DNS resolver, port 5335)
-            └──> Valkey (DNS cache persistence via cachedb module)
 ```
 
 | Service | Role |
 |---|---|
 | [Pi-hole](https://pi-hole.net/) | Network-wide ad blocker and DNS server (installed via automated installer) |
 | [Unbound](https://nlnetlabs.nl/projects/unbound/) | Recursive, validating DNS resolver upstream for Pi-hole |
-| [Valkey](https://valkey.io/) | Redis-compatible cache used by Unbound's `cachedb` module to persist DNS cache across restarts |
 
 ## Requirements
 
@@ -51,9 +49,6 @@ rpi ansible_host=192.168.10.2
 # Install Unbound
 ansible-playbook install_unbound.yml
 
-# Install Valkey
-ansible-playbook install_valkey.yml
-
 # Install Pi-hole and apply configuration in one step
 ansible-playbook install_pihole.yml
 ```
@@ -61,9 +56,6 @@ ansible-playbook install_pihole.yml
 ### Configuration
 
 ```bash
-# Configure Valkey (run first — Unbound depends on it)
-ansible-playbook config_valkey.yml
-
 # Configure Unbound
 ansible-playbook config_unbound.yml
 
@@ -79,8 +71,8 @@ ansible-playbook setup_ufw.yml
 ### Stack lifecycle
 
 ```bash
-ansible-playbook start_all.yml    # Start: Valkey → Unbound → Pi-hole
-ansible-playbook stop_all.yml     # Stop:  Pi-hole → Unbound → Valkey
+ansible-playbook start_all.yml    # Start: Unbound → Pi-hole
+ansible-playbook stop_all.yml     # Stop:  Pi-hole → Unbound
 ansible-playbook restart_all.yml  # Full ordered restart of the stack
 ```
 
@@ -111,20 +103,16 @@ ansible-rpi/
 ├── roles/
 │   ├── common/                # Shared tasks (service management, UFW) and handlers
 │   ├── install_unbound/       # Install Unbound via apt
-│   ├── install_valkey/        # Install Valkey via apt
 │   ├── install_pihole/        # Install Pi-hole via automated installer
-│   ├── configure_unbound/     # Unbound config templates + systemd overrides
-│   ├── configure_valkey/      # Valkey config template + systemd overrides
+│   ├── configure_unbound/     # Unbound config templates
 │   ├── configure_pihole/      # Pi-hole teleporter import + systemd overrides
 │   ├── setup_ufw/             # UFW firewall rules
 │   ├── restart_stack/         # Ordered stack restart
 │   └── get_pihole_backup/     # Export and fetch Pi-hole teleporter backup
 ├── ansible.cfg
 ├── install_unbound.yml
-├── install_valkey.yml
 ├── install_pihole.yml
 ├── config_unbound.yml
-├── config_valkey.yml
 ├── config_pihole.yml
 ├── setup_ufw.yml
 ├── start_all.yml
@@ -152,7 +140,3 @@ Pi-hole settings are managed via the [Teleporter](https://docs.pi-hole.net/core/
 1. Run `ansible-playbook backup_pihole.yml` to export the current settings.
 2. Modify the exported `roles/configure_pihole/files/pihole_teleporter.zip` as needed.
 3. Run `ansible-playbook config_pihole.yml` to re-import.
-
-## Valkey Configuration
-
-Valkey is configured to use a Unix socket (`/run/valkey/valkey.sock`) for low-latency IPC with Unbound. TCP port is disabled (`port 0`). Memory is capped at 32MB with an `allkeys-lru` eviction policy, suitable for a Raspberry Pi. RDB persistence is enabled so the DNS cache survives reboots.
