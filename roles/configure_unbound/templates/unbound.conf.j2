@@ -6,10 +6,10 @@ server:
 
     # Listen on localhost only
     interface: lo
-    interface: [::1]
 
-    # Allow queries from localhost and LAN network
+    # Allow queries from localhost only
     access-control: 127.0.0.1 allow
+    access-control: ::1 allow
 
     # Prevent DNS rebinding attacks by treating LAN network as private
     private-address: {{ lan_network }}

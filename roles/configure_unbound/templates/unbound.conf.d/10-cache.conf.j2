@@ -13,20 +13,4 @@ server:
     prefetch: yes               # Refresh popular records before they expire
 
     # Disable prefetching of DNSKEY records to save resources on low-end devices
-    prefetch-key: no            # Disable prefetching of DNSKEY records to save resources
-
-    # Configure cache sizes to balance performance and memory usage
-    msg-cache-size: 10m
-    
-    # Reduce rrset cache size to save memory on low-end devices while still providing caching benefits
-    rrset-cache-size: 20m
-    
-    # Reduce infra cache size to save memory while still caching infrastructure data
-    infra-cache-size: 4m
-
-    # Infra cache slabs and numhosts to save memory while still caching infrastructure data
-    infra-cache-slabs: 1
-    infra-cache-numhosts: 2000
-    
-    # Ensure kernel buffer is large enough to not lose messages in traffic spikes
-    so-rcvbuf: 1m
+    # prefetch-key: no            # Disable prefetching of DNSKEY records to save resources

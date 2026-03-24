@@ -1,7 +1,17 @@
 server:
-    # Optimization for Single Core ARMv6
+    # Core optimization for single-core ARMv6
     num-threads: 1
+    
+    # Cache slab optimizations
     msg-cache-slabs: 1
     rrset-cache-slabs: 1
     infra-cache-slabs: 1
-    key-cache-slabs: 1
+    
+    # DNSSEC-related (optional - safe to leave even if disabled)
+    val-log-level: 0            # Don't log DNSSEC details
+    key-cache-slabs: 1          # Not used if DNSSEC is off
+    
+    # Memory limits for low-RAM devices
+    msg-cache-size: 15m         # Adjust based on your RAM
+    rrset-cache-size: 30m       # Adjust based on your RAM
+    infra-cache-numhosts: 2000  # Smaller for limited RAM
