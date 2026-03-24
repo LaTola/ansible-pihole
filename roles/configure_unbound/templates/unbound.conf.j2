@@ -1,10 +1,17 @@
 # Minimal working Unbound configuration
 
 server:
+    # Listen on port 5335 to avoid conflicts with system DNS
+    port: 5335
+
     # Listen on localhost only
     interface: lo
-    port: 5335
+    interface: [::1]
+
+    # Allow queries from localhost and LAN network
     access-control: 127.0.0.1 allow
+
+    # Prevent DNS rebinding attacks by treating LAN network as private
     private-address: {{ lan_network }}
     
     # DNS settings
