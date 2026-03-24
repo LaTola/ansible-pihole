@@ -5,6 +5,7 @@ server:
     interface: lo
     port: 5335
     access-control: 127.0.0.1 allow
+    private-address: {{ lan_network }}
     
     # DNS settings
     do-ip4: yes
