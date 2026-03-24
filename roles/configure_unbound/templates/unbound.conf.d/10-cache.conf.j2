@@ -1,7 +1,32 @@
 server:    
     # Cache Performance Tweaks
+    # Configure cache TTLs to balance freshness and performance
     cache-min-ttl: 300          # 5 minutes minimum (reduces upstream traffic)
+    
+    # Set a reasonable maximum TTL to prevent stale data from being served for too long
     cache-max-ttl: 86400        # 1 day maximum
+
+    # Enable serving expired records while fetching fresh ones to improve responsiveness
     serve-expired: yes          # Return expired records while fetching fresh ones
+
+    # Enable prefetching of popular records to keep the cache warm and improve performance
     prefetch: yes               # Refresh popular records before they expire
+
+    # Disable prefetching of DNSKEY records to save resources on low-end devices
     prefetch-key: no            # Disable prefetching of DNSKEY records to save resources
+
+    # Configure cache sizes to balance performance and memory usage
+    msg-cache-size: 10m
+    
+    # Reduce rrset cache size to save memory on low-end devices while still providing caching benefits
+    rrset-cache-size: 20m
+    
+    # Reduce infra cache size to save memory while still caching infrastructure data
+    infra-cache-size: 4m
+
+    # Infra cache slabs and numhosts to save memory while still caching infrastructure data
+    infra-cache-slabs: 1
+    infra-cache-numhosts: 2000
+    
+    # Ensure kernel buffer is large enough to not lose messages in traffic spikes
+    so-rcvbuf: 1m
