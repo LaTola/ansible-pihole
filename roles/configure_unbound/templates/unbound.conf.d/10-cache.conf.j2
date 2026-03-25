@@ -1,16 +1,13 @@
 server:    
     # Cache Performance Tweaks
     # Configure cache TTLs to balance freshness and performance
-    cache-min-ttl: 300          # 5 minutes minimum (reduces upstream traffic)
+    cache-min-ttl: 300          # Minimum time-to-live in seconds for cached records; overrides lower TTL values from DNS responses to reduce upstream queries; set to 300s (5 minutes) to balance freshness with cache efficiency
     
     # Set a reasonable maximum TTL to prevent stale data from being served for too long
-    cache-max-ttl: 86400        # 1 day maximum
+    cache-max-ttl: 86400        # Maximum time-to-live in seconds for cached records; caps upper TTL values from DNS responses to prevent excessively long caching; set to 86400s (1 day) as a reasonable upper bound
 
     # Enable serving expired records while fetching fresh ones to improve responsiveness
-    serve-expired: yes          # Return expired records while fetching fresh ones
+    serve-expired: yes          # When enabled, immediately returns expired cache entries while simultaneously refreshing them in the background; improves perceived latency at the cost of potentially serving slightly stale data
 
     # Enable prefetching of popular records to keep the cache warm and improve performance
-    prefetch: yes               # Refresh popular records before they expire
-
-    # Disable prefetching of DNSKEY records to save resources on low-end devices
-    # prefetch-key: no            # Disable prefetching of DNSKEY records to save resources
+    prefetch: yes               # Automatically refreshes frequently-requested records before their TTL expires; keeps the cache warm and reduces latency for popular domains

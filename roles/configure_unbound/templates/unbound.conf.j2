@@ -2,27 +2,27 @@
 
 server:
     # Listen on port 5335 to avoid conflicts with system DNS
-    port: 5335
+    port: 5335        # Sets the listening port for DNS queries; uses 5335 instead of standard port 53 to avoid conflicts with system DNS services or other resolvers
 
     # Listen on localhost only
-    interface: lo
+    interface: lo     # Binds Unbound to the loopback interface (127.0.0.1 and ::1) only; prevents exposure to external networks and accepts connections from localhost only
 
     # Allow queries from localhost only
-    access-control: 127.0.0.1 allow
-    access-control: ::1 allow
+    access-control: 127.0.0.1 allow    # Grants query permission to IPv4 localhost; blocks queries from any other IPv4 source
+    access-control: ::1 allow          # Grants query permission to IPv6 localhost; blocks queries from any other IPv6 source
 
     # Prevent DNS rebinding attacks by treating LAN network as private
-    private-address: {{ lan_network }}
-    
+    private-address: {{ lan_network }} # Defines which IP ranges are considered private for DNS rebinding protection; prevents DNS responses from pointing to internal IP addresses, mitigating DNS rebinding attacks
+
     # DNS settings
-    do-ip4: yes
-    do-ip6: yes
-    do-udp: yes
-    do-tcp: yes
+    do-ip4: yes       # Enables IPv4 support; allows Unbound to communicate over IPv4 for both listening and upstream queries
+    do-ip6: yes       # Enables IPv6 support; allows Unbound to communicate over IPv6 for both listening and upstream queries
+    do-udp: yes       # Enables UDP transport for DNS; UDP is the default lightweight transport for DNS queries and responses
+    do-tcp: yes       # Enables TCP transport for DNS; required for large responses, DNSSEC, zone transfers, and fallback when UDP truncation occurs
 
     # Logging
-    verbosity: 1
-    use-syslog: yes
+    verbosity: 1      # Sets logging detail level; 1 provides moderate logging (default level) - errors, warnings, and basic operational information
+    use-syslog: yes   # Sends log messages to syslog daemon instead of stderr; useful for centralized logging and daemonized operation
 
 # Include additional config files
-include: "{{ unbound_config_dir }}/unbound.conf.d/*.conf"
+include: "{{ unbound_config_dir }}/unbound.conf.d/*.conf"  # Loads all configuration files with .conf extension from the specified directory; allows modular configuration management by splitting settings across multiple files

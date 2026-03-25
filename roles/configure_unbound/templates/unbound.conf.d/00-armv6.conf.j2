@@ -1,17 +1,22 @@
 server:
     # Core optimization for single-core ARMv6
-    num-threads: 1
+    num-threads: 1               # Sets the number of server threads to 1, optimal for single-core processors to avoid context switching overhead
     
     # Cache slab optimizations
-    msg-cache-slabs: 1
-    rrset-cache-slabs: 1
-    infra-cache-slabs: 1
+    msg-cache-slabs: 1           # Number of slabs for message cache; 1 slab reduces memory overhead for small caches on low-RAM systems
+    rrset-cache-slabs: 1         # Number of slabs for resource record set cache; single slab minimizes memory fragmentation on memory-constrained devices
+    infra-cache-slabs: 1         # Number of slabs for infrastructure cache (nameserver RTT, preferences); 1 slab conserves memory on low-spec hardware
     
     # DNSSEC-related (optional - safe to leave even if disabled)
-    val-log-level: 0            # Don't log DNSSEC details
-    key-cache-slabs: 1          # Not used if DNSSEC is off
+    val-log-level: 0             # Disables logging of DNSSEC validation details; set to 0 to reduce log noise when DNSSEC is not in use
+    key-cache-slabs: 1           # Number of slabs for DNSSEC key cache; has minimal effect when DNSSEC validation is disabled, but reduces memory allocation overhead
     
     # Memory limits for low-RAM devices
-    msg-cache-size: 15m         # Adjust based on your RAM
-    rrset-cache-size: 30m       # Adjust based on your RAM
-    infra-cache-numhosts: 2000  # Smaller for limited RAM
+    msg-cache-size: 15m          # Maximum memory allocated for message cache (DNS messages); adjust this value based on available RAM, typically 15-50 MB for constrained devices
+    rrset-cache-size: 30m        # Maximum memory allocated for RRset cache (DNS records); should be larger than msg-cache-size as it stores the actual record data
+    infra-cache-numhosts: 2000   # Maximum number of nameservers to cache infrastructure data (RTT, EDNS, etc.); reduced for limited RAM environments
+    
+    incoming-num-tcp: 50         # Maximum number of TCP connections that can be handled simultaneously for incoming queries
+    tcp-idle-timeout: 2000       # Timeout in milliseconds before closing idle TCP connections; 1000 ms (≈1 second) reaps idle connections to conserve resources
+    outgoing-range: 8192         # Number of ephemeral ports available for outgoing queries to upstream servers; higher values reduce port exhaustion under load
+    num-queries-per-thread: 4096 # Maximum number of queries processed per thread before checking for new work; balances latency and throughput on single-core setups
