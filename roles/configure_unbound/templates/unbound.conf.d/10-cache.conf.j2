@@ -11,3 +11,6 @@ server:
 
     # Enable prefetching of popular records to keep the cache warm and improve performance
     prefetch: yes               # Automatically refreshes frequently-requested records before their TTL expires; keeps the cache warm and reduces latency for popular domains
+
+    # Serve expired replies when resolution takes longer than 1.0 seconds, in milliseconds
+    serve-expired-client-timeout: 1000
