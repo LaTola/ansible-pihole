@@ -1,0 +1,22 @@
+---
+
+- name: Configure Cron Jobs
+  become: true
+  become_method: ansible.builtin.sudo
+  block:
+    - name: Deploy crontab from Jinja2 template
+      ansible.builtin.template:
+        src: templates/crontab.j2
+        dest: /tmp/crontab
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Install new crontab
+      ansible.builtin.command: "crontab -u root /tmp/crontab"
+      changed_when: false
+
+    - name: Remove temporary crontab file
+      ansible.builtin.file:
+        path: /tmp/crontab
+        state: absent

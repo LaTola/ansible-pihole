@@ -10,3 +10,4 @@
 
   roles:
     - role: configure_pihole
+    - role: configure_cron

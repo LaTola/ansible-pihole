@@ -1,0 +1,8 @@
+# Managed by Ansible - do not edit manually
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+{% for job in configure_cron_jobs %}
+# {{ job.name }}
+{{ job.minute | default('*') }} {{ job.hour | default('*') }} {{ job.day | default('*') }} {{ job.month | default('*') }} {{ job.weekday | default('*') }} {{ job.user | default('root') }} {{ job.command }}
+{% endfor %}
