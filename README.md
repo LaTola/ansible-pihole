@@ -18,6 +18,7 @@ Pi-hole (ad-blocking DNS)
 |---|---|
 | [Pi-hole](https://pi-hole.net/) | Network-wide ad blocker and DNS server (installed via automated installer) |
 | [Unbound](https://nlnetlabs.nl/projects/unbound/) | Recursive, validating DNS resolver upstream for Pi-hole |
+| cron | Scheduled maintenance: gravity updates, Pi-hole updates, FTL DB optimization, log/tmp cleanup |
 
 ## Requirements
 
@@ -43,13 +44,20 @@ rpi ansible_host=192.168.10.2
 
 ## Playbooks
 
+### Full setup
+
+```bash
+# Install and configure the entire stack in one step
+ansible-playbook setup_all.yml
+```
+
 ### Installation
 
 ```bash
-# Install Unbound
+# Install and configure Unbound
 ansible-playbook install_unbound.yml
 
-# Install Pi-hole and apply configuration in one step
+# Install Pi-hole, apply configuration, and set up cron jobs in one step
 ansible-playbook install_pihole.yml
 ```
 
@@ -59,14 +67,14 @@ ansible-playbook install_pihole.yml
 # Configure Unbound
 ansible-playbook config_unbound.yml
 
-# Configure Pi-hole (imports settings via teleporter backup)
+# Configure Pi-hole and cron jobs (imports settings via teleporter backup)
 ansible-playbook config_pihole.yml
 
 # Configure UFW firewall
 ansible-playbook setup_ufw.yml
 ```
 
-> **Note:** `install_pihole.yml` runs both the `install_pihole` and `configure_pihole` roles in sequence, so a separate `config_pihole.yml` run is not needed after a fresh install.
+> **Note:** `install_unbound.yml` runs both `install_unbound` and `configure_unbound` in sequence. `install_pihole.yml` runs `install_pihole`, `configure_pihole`, and `configure_cron` in sequence, so separate config runs are not needed after a fresh install.
 
 ### Stack lifecycle
 
@@ -106,10 +114,12 @@ ansible-rpi/
 │   ├── install_pihole/        # Install Pi-hole via automated installer
 │   ├── configure_unbound/     # Unbound config templates
 │   ├── configure_pihole/      # Pi-hole teleporter import + systemd overrides
+│   ├── configure_cron/        # Cron jobs and maintenance scripts
 │   ├── setup_ufw/             # UFW firewall rules
 │   ├── restart_stack/         # Ordered stack restart
 │   └── get_pihole_backup/     # Export and fetch Pi-hole teleporter backup
 ├── ansible.cfg
+├── setup_all.yml
 ├── install_unbound.yml
 ├── install_pihole.yml
 ├── config_unbound.yml
