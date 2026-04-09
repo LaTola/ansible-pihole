@@ -6,7 +6,8 @@
   handlers:
     - name: Import global handlers
       ansible.builtin.import_tasks: roles/common/handlers/main.yml
-  
+
   roles:
     - role: install_pihole
     - role: configure_pihole
+    - role: configure_cron
