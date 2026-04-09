@@ -8,25 +8,19 @@ configure_cron_jobs:
 
   - name: "Update Gravity"
     minute: "00"
-    hour: "05"
+    hour: "04"
     command: "/usr/local/bin/pihole -g"
 
   - name: "Optimize FTL Database"
-    hour: "04"
+    hour: "03"
     minute: "00"
     day_of_week: "1"
-    command: "cd /etc/pihole && /root/.local/bin/optimize_FTL.sh"
+    command: "/root/.local/bin/optimize_FTL.sh"
 
   - name: "Update Pi-hole"
     minute: "00"
-    hour: "03"
-    command: "/usr/local/bin/pihole -up > /var/log/pihole/piholeUpdate.log 2>&1"
-
-  - name: "Install rpi packages"
-    minute: "00"
     hour: "02"
-    day: "*/7"
-    command: "/usr/local/bin/install_rpi_packages.sh > /var/log/install_rpi_packages.log 2>&1"
+    command: "/usr/local/bin/pihole -up > /var/log/pihole/piholeUpdate.log 2>&1"
 
   - name: "Cleanup tmp"
     minute: "00"
@@ -39,3 +33,5 @@ configure_cron_jobs:
     hour: "00"
     day: "*/7"
     command: "/usr/bin/find /var/log -type f -mtime +7 -delete"
+
+configure_cron_scripts_root: "/root/.local/bin"
