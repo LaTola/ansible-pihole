@@ -22,6 +22,7 @@
           - { name: "Allow loopback out", interface: "lo", direction: "out", rule: "allow" }
           - { name: "Default deny incoming", direction: "in", rule: "deny" }
           - { name: "Default allow outgoing", direction: "out", rule: "allow" }
+          - { name: "Enable ntp port", port: 123, proto: "udp", src: "{{ lan_network }}", rule: "allow" }
 
     - name: Ensure UFW is enabled
       community.general.ufw:
