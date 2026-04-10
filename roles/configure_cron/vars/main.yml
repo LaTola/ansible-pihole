@@ -3,7 +3,7 @@
 ## Cron config
 configure_cron_jobs:
   - name: "Sync FileSystem"
-    minute: "0/5"
+    minute: "*/5"
     command: "/usr/bin/sync"
 
   - name: "Update Gravity"
@@ -25,13 +25,13 @@ configure_cron_jobs:
   - name: "Cleanup tmp"
     minute: "00"
     hour: "01"
-    day: "*/7"
+    day_of_week: "0"
     command: "/usr/bin/find /tmp -type f -mtime +7 -delete"
 
   - name: "Cleanup logs"
     minute: "00"
     hour: "00"
-    day: "*/7"
-    command: "/usr/bin/find /var/log -type f -mtime +7 -delete"
+    day_of_week: "0"
+    command: "/usr/bin/find /var/log/ -type f -mtime +7 -delete"
 
 configure_cron_scripts_root: "/root/.local/bin"
