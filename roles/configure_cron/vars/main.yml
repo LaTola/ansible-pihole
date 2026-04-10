@@ -14,7 +14,7 @@ configure_cron_jobs:
   - name: "Optimize FTL Database"
     hour: "03"
     minute: "00"
-    day_of_week: "1"
+    weekday: "1"
     command: "/root/.local/bin/optimize_FTL.sh"
 
   - name: "Update Pi-hole"
@@ -25,13 +25,13 @@ configure_cron_jobs:
   - name: "Cleanup tmp"
     minute: "00"
     hour: "01"
-    day_of_week: "0"
+    weekday: "0"
     command: "/usr/bin/find /tmp -type f -mtime +7 -delete"
 
   - name: "Cleanup logs"
     minute: "00"
     hour: "00"
-    day_of_week: "0"
+    weekday: "0"
     command: "/usr/bin/find /var/log/ -type f -mtime +7 -delete"
 
 configure_cron_scripts_root: "/root/.local/bin"
