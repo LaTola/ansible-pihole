@@ -63,10 +63,13 @@ ansible-playbook config_unbound.yml
 ansible-playbook config_pihole.yml
 
 # Configure UFW firewall
-ansible-playbook setup_ufw.yml
+ansible-playbook configure_ufw.yml
+
+# Configure NTPD (installs ntp, deploys ntp.conf, updates UFW)
+ansible-playbook configure_ntpd.yml
 ```
 
-> **Note:** `install_pihole.yml` runs both the `install_pihole` and `configure_pihole` roles in sequence, so a separate `config_pihole.yml` run is not needed after a fresh install.
+> **Note:** `install_pihole.yml` runs `install_pihole`, `configure_pihole`, and `configure_cron` roles in sequence, so a separate `config_pihole.yml` run is not needed after a fresh install.
 
 ### Stack lifecycle
 
@@ -90,6 +93,7 @@ ansible-playbook backup_pihole.yml
 | Allow SSH | 22 | TCP | LAN (`192.168.10.0/24`) |
 | Allow DNS | 53 | TCP+UDP | LAN |
 | Allow Pi-hole dashboard | 80 | TCP | LAN |
+| Allow NTP | 123 | UDP | LAN |
 | Allow loopback in/out | — | — | `lo` interface |
 | Default deny incoming | — | — | — |
 | Default allow outgoing | — | — | — |
@@ -106,7 +110,9 @@ ansible-rpi/
 │   ├── install_pihole/        # Install Pi-hole via automated installer
 │   ├── configure_unbound/     # Unbound config templates
 │   ├── configure_pihole/      # Pi-hole teleporter import + systemd overrides
-│   ├── setup_ufw/             # UFW firewall rules
+│   ├── configure_ufw/         # UFW firewall rules
+│   ├── configure_ntpd/        # NTP daemon config
+│   ├── configure_cron/        # Cron jobs and maintenance scripts
 │   ├── restart_stack/         # Ordered stack restart
 │   └── get_pihole_backup/     # Export and fetch Pi-hole teleporter backup
 ├── ansible.cfg
@@ -114,7 +120,8 @@ ansible-rpi/
 ├── install_pihole.yml
 ├── config_unbound.yml
 ├── config_pihole.yml
-├── setup_ufw.yml
+├── configure_ufw.yml
+├── configure_ntpd.yml
 ├── start_all.yml
 ├── stop_all.yml
 ├── restart_all.yml
