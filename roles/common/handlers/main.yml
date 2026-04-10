@@ -16,3 +16,11 @@
     service_state: restarted
     service_action: restart
     service_daemon_reload: true
+
+- name: Restart ntpd
+  ansible.builtin.include_tasks: ../tasks/manage_service.yml
+  vars:
+    service_name: ntpd
+    service_state: restarted
+    service_action: restart
+    service_daemon_reload: true
