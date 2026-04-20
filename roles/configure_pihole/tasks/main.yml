@@ -31,7 +31,23 @@
       register: pihole_import
       changed_when: pihole_import.rc != 0 # <- Uses the return code to define when the task has changed.
 
+    - name: Update gravity DB
+      ansible.builtin.command:
+        cmd: "pihole -g"
+      register: pihole_gravity_update
+      changed_when: pihole_gravity_update.rc != 0 # <- Uses the return code to define when the task has changed.
+      async: 1200
+      poll: 0
+
     - name: Remove pihole teleporter file
       ansible.builtin.file:
         path: "{{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
         state: absent
+
+    - name: Wait for gravity update to complete
+      ansible.builtin.async_status:
+        jid: "{{ pihole_gravity_update.ansible_job_id }}"
+      register: pihole_gravity_update_status
+      until: pihole_gravity_update_status.finished
+      retries: 100
+      delay: 10
