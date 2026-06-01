@@ -2,6 +2,10 @@
 
 ## Cron config
 configure_cron_jobs:
+  - name: "This unbound restart avoid bogus resolver status after reboot"
+    minute: "@reboot"
+    command: "sleep 120 && systemctl restart unbound"
+
   - name: "Sync FileSystem"
     minute: "*/5"
     command: "/usr/bin/sync"
