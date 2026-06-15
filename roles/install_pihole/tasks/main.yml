@@ -13,7 +13,7 @@
   block:
     - name: Update apt cache
       ansible.builtin.apt:
-        update_cache: yes
+        update_cache: true
         cache_valid_time: 3600
 
     - name: Install prerequisite packages
@@ -24,26 +24,71 @@
           - netcat-openbsd
         state: present
 
+    - name: Ensure /etc/pihole directory exists
+      become: true
+      ansible.builtin.file:
+        path: /etc/pihole
+        state: directory
+        mode: '0755'
+
+    - name: Create Pi-hole setupVars.conf
+      become: true
+      become_method: ansible.builtin.sudo
+      ansible.builtin.copy:
+        dest: /etc/pihole/setupVars.conf
+        content: |
+          PIHOLE_INTERFACE=eth0
+          IPV4_ADDRESS={{ ansible_host }}/24
+          IPV6_ADDRESS=
+          QUERY_LOGGING=true
+          INSTALL_WEB_SERVER=true
+          INSTALL_WEB_INTERFACE=true
+          LIGHTTPD_ENABLED=true
+          CACHE_SIZE=10000
+          DNS_FQDN_REQUIRED=false
+          DNS_BOGUS_PRIV=true
+          DNSSEC=false
+          TEMPERATUREUNIT=C
+          WEBUIBOXEDLAYOUT=traditional
+          API_EXCLUDE_DOMAINS=
+          API_EXCLUDE_CLIENTS=
+          API_QUERY_LOG_SHOW=all
+          API_PRIVACY_MODE=false
+          PIHOLE_DNS_1=1.1.1.1
+          PIHOLE_DNS_2=8.8.8.8
+          WEBPASSWORD={{ pihole_default_webpassword | hash('sha256') }}
+        mode: '0644'
+        owner: root
+        group: root
+
     - name: Download the Pi-hole automated installer
       ansible.builtin.get_url:
         url: https://install.pi-hole.net
         dest: /tmp/pi-hole-installer.sh
         mode: '0755'
 
+    - name: Check if Pi-hole is already installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/pihole
+      register: pihole_binary
+
     - name: Run the Pi-hole installer in non-interactive mode
+      become: true
+      become_method: ansible.builtin.sudo
       ansible.builtin.shell: |
-        /tmp/pi-hole-installer.sh \
-          --unattended \
-          --web-password "{{ pihole_default_webpassword }}"
-      args:
-        creates: /etc/pihole/setupVars.conf # Only run if Pi-hole isn't already installed
+        /tmp/pi-hole-installer.sh --unattended --web-password "{{ pihole_default_webpassword }}"
+      environment:
+        TERM: xterm-256color
+      when: not pihole_binary.stat.exists
+      changed_when: true
+      no_log: true
 
     - name: Ensure the pihole-FTL service is running and enabled
       ansible.builtin.systemd:
         name: pihole-FTL
         state: started
         enabled: yes
-    
+
     - name: Clean up installer script
       ansible.builtin.file:
         path: /tmp/pi-hole-installer.sh

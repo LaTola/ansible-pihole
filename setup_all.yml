@@ -2,4 +2,4 @@
 
 - ansible.builtin.import_playbook: install_unbound.yml
 - ansible.builtin.import_playbook: install_pihole.yml
-- ansible.builtin.import_playbook: setup_ufw.yml
+- ansible.builtin.import_playbook: configure_ufw.yml
