@@ -1,18 +1,38 @@
 ---
-- name: Configure NTPD
+- name: "Configure {{ ntp_package }} as NTPD"
+  when: ntp_package == "ntp"
   become: true
   become_method: ansible.builtin.sudo
   block:
-    - name: Ensure NTPD is installed
+    - name: Ensure {{ ntp_package }} is installed
       ansible.builtin.package:
         name: ntp
         state: present
 
-    - name: Configure NTPD
+    - name: Configure {{ ntp_package }}
       ansible.builtin.copy:
         src: files/ntp.conf
         dest: /etc/ntp.conf
         owner: root
         group: root
         mode: '0644'
-      notify: Restart ntpd
+      notify: Restart {{ ntp_package }}
+
+- name: "Configure {{ ntp_package }} (chrony) as NTPD"
+  when: ntp_package == "chrony"
+  become: true
+  become_method: ansible.builtin.sudo
+  block:
+    - name: Ensure {{ ntp_package }} is installed
+      ansible.builtin.package:
+        name: chrony
+        state: present
+
+    - name: Configure {{ ntp_package }}
+      ansible.builtin.template:
+        src: files/chrony.conf.j2
+        dest: /etc/chrony/chrony.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart {{ ntp_package }}

@@ -11,6 +11,12 @@
         dest: "/etc/hosts"
         mode: "0644"
 
+    - name: Ensure pihole-FTL service override directory exists
+      ansible.builtin.file:
+        path: "{{ systemd_unit_dir }}/pihole-FTL.service.d"
+        state: directory
+        mode: "0755"
+
     - name: Copy pihole-FTL service override configuration files
       ansible.builtin.copy:
         src: "{{ item }}"
@@ -32,12 +38,21 @@
       changed_when: pihole_import.rc != 0 # <- Uses the return code to define when the task has changed.
 
     - name: Update gravity DB
+      become: true
       ansible.builtin.command:
-        cmd: "pihole -g"
+        cmd: pihole -g
       register: pihole_gravity_update
-      changed_when: pihole_gravity_update.rc != 0 # <- Uses the return code to define when the task has changed.
       async: 1200
       poll: 0
+
+    - name: Wait for gravity DB update to complete
+      ansible.builtin.async_status:
+        jid: "{{ pihole_gravity_update.ansible_job_id }}"
+      register: gravity_job_result
+      until: gravity_job_result.finished
+      retries: 40
+      delay: 30
+      changed_when: gravity_job_result.rc == 0
 
     - name: Remove pihole teleporter file
       ansible.builtin.file:

@@ -1,0 +1,19 @@
+# /etc/chrony/chrony.conf
+# NTP sources - South America pool
+pool south-america.pool.ntp.org iburst maxsources 4
+
+# Drift file to track clock frequency error
+driftfile /var/lib/chrony/drift
+
+# Allow stepping the clock in the first 3 updates if offset > 1s
+makestep 1.0 3
+
+# Sync hardware clock (RTC) to system clock
+rtcsync
+
+# Reduce logging verbosity
+logchange 0.5
+logdir /var/log/chrony
+
+# Allow NTP client access from local network (uncomment if serving LAN)
+allow {{ lan_network }}

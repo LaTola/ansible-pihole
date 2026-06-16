@@ -23,6 +23,7 @@
     - name: Install Unbound and dependencies (if not installed)
       ansible.builtin.apt:
         name:
+          - "{{ ntp_package }}"
           - unbound
           - dnsutils
         state: present

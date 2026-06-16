@@ -4,6 +4,12 @@
   become: true
   become_method: ansible.builtin.sudo
   block:
+    - name: Ensure cron scripts root directory exists
+      ansible.builtin.file:
+        path: "{{ configure_cron_scripts_root }}"
+        state: directory
+        owner: root
+
     - name: Install maintenance scripts
       ansible.builtin.copy:
         src: "{{ item }}"

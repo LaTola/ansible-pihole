@@ -1,0 +1,29 @@
+server:
+    # ─── PRIVACIDAD ──────────────────────────────────────────────
+    # Minimiza qué parte del nombre se envía a cada nameserver (RFC 7816)
+    qname-minimisation: yes
+
+    # ─── ANTI-SPOOFING ───────────────────────────────────────────
+    # Randomiza el caso de las queries para dificultar envenenamiento de caché
+    use-caps-for-id: no
+
+    # ─── PRIVATE ADDRESS ADICIONALES ─────────────────────────────
+    # unbound.conf ya tiene 192.168.10.0/24; acá cubrimos el resto de RFC 1918
+    private-address: 192.168.0.0/16
+    private-address: 10.0.0.0/8
+    private-address: 172.16.0.0/12
+    private-address: 169.254.0.0/16
+    private-address: fd00::/8
+    private-address: fe80::/10
+
+    # ─── SO BUFFER TUNING ────────────────────────────────────────
+    # Buffers más grandes mejoran throughput bajo ráfagas de queries
+    so-rcvbuf: 4m
+    so-sndbuf: 4m
+
+    # Necesario para que num-threads > 1 sea efectivo
+    so-reuseport: yes
+
+    # ─── LOGGING ─────────────────────────────────────────────────
+    log-queries: no
+    log-replies: no

@@ -9,4 +9,4 @@
 
   roles:
     - role: configure_ntpd
-    - role: configure_ufw
+#    - role: configure_ufw
