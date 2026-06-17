@@ -16,7 +16,7 @@ server:
 
     # DNS settings
     do-ip4: yes       # Enables IPv4 support; allows Unbound to communicate over IPv4 for both listening and upstream queries
-    do-ip6: yes       # Enables IPv6 support; allows Unbound to communicate over IPv6 for both listening and upstream queries
+    do-ip6: no        # Disable IPv6 support;
     do-udp: yes       # Enables UDP transport for DNS; UDP is the default lightweight transport for DNS queries and responses
     do-tcp: yes       # Enables TCP transport for DNS; required for large responses, DNSSEC, zone transfers, and fallback when UDP truncation occurs
 
