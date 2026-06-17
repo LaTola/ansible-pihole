@@ -49,3 +49,9 @@
       register: unbound_checkconf
       failed_when: unbound_checkconf.rc != 0
       changed_when: false
+
+    - name: Unbound control setup
+      ansible.builtin.command: unbound-control-setup
+      register: unbound_control_setup
+      failed_when: unbound_control_setup.rc != 0
+      changed_when: false
