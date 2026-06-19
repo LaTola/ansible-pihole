@@ -1,158 +1,217 @@
 # ansible-rpi
 
 ![Ansible](https://img.shields.io/badge/Ansible-EE0000?style=flat&logo=ansible&logoColor=white)
-![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-A22846?style=flat&logo=raspberrypi&logoColor=white)
+![Armbian](https://img.shields.io/badge/Armbian-DD4814?style=flat&logo=armbian&logoColor=white)
+![Orange Pi Zero 3](https://img.shields.io/badge/Orange%20Pi%20Zero%203-FF7900?style=flat&logo=orangepi&logoColor=white)
 ![Pi-hole](https://img.shields.io/badge/Pi--hole-96060C?style=flat&logo=pihole&logoColor=white)
-![Platform](https://img.shields.io/badge/platform-ARMv6%2FARMv7-lightgrey?style=flat)
+![Platform](https://img.shields.io/badge/platform-ARM64-lightgrey?style=flat)
 
-Ansible playbooks to automate the setup and configuration of a Raspberry Pi as a self-hosted, privacy-focused DNS stack with ad-blocking and persistent DNS caching.
+Ansible playbooks for running an Orange Pi Zero 3 with Armbian as a small self-hosted DNS stack with Pi-hole, Unbound, firewall rules, time sync, backups, and scheduled maintenance.
 
 ## Stack
 
-```
-Pi-hole (ad-blocking DNS)
-    └──> Unbound (recursive DNS resolver, port 5335)
+```text
+Clients
+  -> Pi-hole on port 53
+      -> Unbound recursive resolver on localhost port 5335
 ```
 
-| Service | Role |
+| Service | Purpose |
 |---|---|
-| [Pi-hole](https://pi-hole.net/) | Network-wide ad blocker and DNS server (installed via automated installer) |
-| [Unbound](https://nlnetlabs.nl/projects/unbound/) | Recursive, validating DNS resolver upstream for Pi-hole |
-| cron | Scheduled maintenance: gravity updates, Pi-hole updates, FTL DB optimization, log/tmp cleanup |
+| [Pi-hole](https://pi-hole.net/) | Network-wide DNS filtering and web dashboard |
+| [Unbound](https://nlnetlabs.nl/projects/unbound/) | Recursive, validating DNS resolver used by Pi-hole |
+| UFW | Host firewall limited to the configured LAN |
+| chrony or ntp | Time synchronization, selected with `ntp_package` |
+| cron | Root crontab for Pi-hole updates, gravity updates, cleanup, and maintenance |
 
 ## Requirements
 
-- Ansible 2.12+
-- `community.general` collection (for UFW module)
-- `ansible.posix` collection (for profiling callbacks)
-- A Raspberry Pi reachable at `192.168.10.2` with SSH access and `sudo` privileges
-
-Install required collections:
+- Ansible 2.12 or newer on the control machine
+- SSH access to the Orange Pi Zero 3
+- A remote user with `sudo` privileges
+- Internet access from the Orange Pi Zero 3 during install/configuration
+- Required Ansible collections:
 
 ```bash
 ansible-galaxy collection install community.general ansible.posix
 ```
 
+The project uses `inventory/inventory.ini` by default through `ansible.cfg`.
+
 ## Inventory
 
-The target host is defined in `inventory/inventory.ini`. Update `ansible_host` to match your Raspberry Pi's IP address.
+The current target host is:
 
 ```ini
 [raspberrypi]
-rpi ansible_host=192.168.10.2
+rpi ansible_host=192.168.10.3
 ```
 
-## Playbooks
+Update `inventory/inventory.ini` before running the playbooks if your Pi uses a different address or LAN.
 
-### Full setup
+Important variables:
+
+| Variable | Current value | Notes |
+|---|---:|---|
+| `lan_network` | `192.168.10.0/24` | Source network allowed through UFW |
+| `ntp_package` | `chrony` | Use `chrony` or `ntp` |
+| `pihole_default_webpassword` | `admin` | Change this before a real deployment |
+| `pihole_teleporter_filename` | `pihole_teleporter.zip` | Pi-hole backup archive used for imports |
+| `unbound_config_dir` | `/etc/unbound` | Main Unbound configuration directory |
+
+## Common Commands
+
+Run the full stack setup:
 
 ```bash
-# Install and configure the entire stack in one step
 ansible-playbook setup_all.yml
 ```
 
-### Installation
+`setup_all.yml` imports these playbooks in order:
+
+1. `install_unbound.yml`
+2. `install_pihole.yml`
+3. `configure_ufw.yml`
+
+Install or reconfigure individual parts:
 
 ```bash
-# Install and configure Unbound
 ansible-playbook install_unbound.yml
-
-# Install Pi-hole, apply configuration, and set up cron jobs in one step
 ansible-playbook install_pihole.yml
-```
-
-### Configuration
-
-```bash
-# Configure Unbound
-ansible-playbook config_unbound.yml
-
-# Configure Pi-hole and cron jobs (imports settings via teleporter backup)
-ansible-playbook config_pihole.yml
-
-# Configure UFW firewall
+ansible-playbook configure_unbound.yml
+ansible-playbook configure_pihole.yml
 ansible-playbook configure_ufw.yml
-
-# Configure NTPD (installs ntp, deploys ntp.conf, updates UFW)
 ansible-playbook configure_ntpd.yml
+ansible-playbook configure_cron.yml
 ```
 
-> **Note:** `install_pihole.yml` runs `install_pihole`, `configure_pihole`, and `configure_cron` roles in sequence, so a separate `config_pihole.yml` run is not needed after a fresh install.
-
-### Stack lifecycle
+Manage the stack services:
 
 ```bash
-ansible-playbook start_all.yml    # Start: Unbound → Pi-hole
-ansible-playbook stop_all.yml     # Stop:  Pi-hole → Unbound
-ansible-playbook restart_all.yml  # Full ordered restart of the stack
+ansible-playbook start_all.yml
+ansible-playbook stop_all.yml
+ansible-playbook restart_all.yml
 ```
 
-### Backup
+Back up Pi-hole settings:
 
 ```bash
-# Export Pi-hole settings and save locally as pihole_teleporter.zip
 ansible-playbook backup_pihole.yml
 ```
 
-## Firewall Rules (UFW)
+## Playbook Reference
 
-| Rule | Port | Protocol | Source |
-|---|---|---|---|
-| Allow SSH | 22 | TCP | LAN (`192.168.10.0/24`) |
-| Allow DNS | 53 | TCP+UDP | LAN |
-| Allow Pi-hole dashboard | 80 | TCP | LAN |
-| Allow NTP | 123 | UDP | LAN |
-| Allow loopback in/out | — | — | `lo` interface |
-| Default deny incoming | — | — | — |
-| Default allow outgoing | — | — | — |
-
-## Project Structure
-
-```
-ansible-rpi/
-├── inventory/
-│   └── inventory.ini          # Host and variable definitions
-├── roles/
-│   ├── common/                # Shared tasks (service management, UFW) and handlers
-│   ├── install_unbound/       # Install Unbound via apt
-│   ├── install_pihole/        # Install Pi-hole via automated installer
-│   ├── configure_unbound/     # Unbound config templates
-│   ├── configure_pihole/      # Pi-hole teleporter import + systemd overrides
-│   ├── configure_ufw/         # UFW firewall rules
-│   ├── configure_ntpd/        # NTP daemon config
-│   ├── configure_cron/        # Cron jobs and maintenance scripts
-│   ├── restart_stack/         # Ordered stack restart
-│   └── get_pihole_backup/     # Export and fetch Pi-hole teleporter backup
-├── ansible.cfg
-├── setup_all.yml
-├── install_unbound.yml
-├── install_pihole.yml
-├── config_unbound.yml
-├── config_pihole.yml
-├── configure_ufw.yml
-├── configure_ntpd.yml
-├── start_all.yml
-├── stop_all.yml
-├── restart_all.yml
-└── backup_pihole.yml
-```
+| Playbook | What it does |
+|---|---|
+| `setup_all.yml` | Runs Unbound install/configuration, Pi-hole install/configuration, cron setup, and UFW configuration |
+| `install_unbound.yml` | Installs Unbound, `dnsutils`, the selected NTP package, then applies Unbound templates |
+| `configure_unbound.yml` | Uploads Unbound config, downloads `root.hints`, rebuilds `unbound.conf.d`, runs `unbound-checkconf`, and sets up `unbound-control` |
+| `install_pihole.yml` | Installs Pi-hole unattended, then imports Pi-hole configuration and installs cron maintenance |
+| `configure_pihole.yml` | Copies `/etc/hosts`, installs the `pihole-FTL` systemd override, imports the Teleporter archive, and runs `pihole -g` |
+| `configure_ufw.yml` | Installs/enables UFW and applies LAN-only rules |
+| `configure_ntpd.yml` | Installs and configures `chrony` or `ntp` based on `ntp_package` |
+| `configure_cron.yml` | Installs root maintenance scripts and root crontab |
+| `start_all.yml` | Starts Unbound, then `pihole-FTL` |
+| `stop_all.yml` | Stops `pihole-FTL`, then Unbound |
+| `restart_all.yml` | Stops `pihole-FTL` and Unbound, then starts Unbound and `pihole-FTL` |
+| `backup_pihole.yml` | Exports a Pi-hole Teleporter archive and saves it under `roles/configure_pihole/files/` |
 
 ## Pi-hole Configuration
 
-### Fresh install
+Pi-hole is installed unattended using `/etc/pihole/setupVars.conf` and the official installer from `https://install.pi-hole.net`.
 
-Pi-hole is installed unattended using the official installer script. The web dashboard password is set via the `pihole_default_webpassword` variable in `inventory/inventory.ini`.
+After installation, this project manages Pi-hole settings with the bundled Teleporter archive:
 
-```ini
-pihole_default_webpassword="your-password"
+```text
+roles/configure_pihole/files/pihole_teleporter.zip
 ```
 
-Running `install_pihole.yml` handles both installation and initial configuration import in one step.
+To capture the current live Pi-hole configuration:
 
-### Updating settings
+```bash
+ansible-playbook backup_pihole.yml
+```
 
-Pi-hole settings are managed via the [Teleporter](https://docs.pi-hole.net/core/pihole-command/#teleporter) backup/restore mechanism:
+To re-import the saved Teleporter archive:
 
-1. Run `ansible-playbook backup_pihole.yml` to export the current settings.
-2. Modify the exported `roles/configure_pihole/files/pihole_teleporter.zip` as needed.
-3. Run `ansible-playbook config_pihole.yml` to re-import.
+```bash
+ansible-playbook configure_pihole.yml
+```
+
+The Pi-hole systemd override in `roles/configure_pihole/files/pihole-FTL.service.d/` makes `pihole-FTL` depend on Unbound.
+
+## Unbound Configuration
+
+Unbound templates live in:
+
+```text
+roles/configure_unbound/templates/
+```
+
+The role writes `/etc/unbound/unbound.conf`, rebuilds `/etc/unbound/unbound.conf.d`, downloads root hints from Internic, validates the result with `unbound-checkconf`, and runs `unbound-control-setup`.
+
+The template set includes cache tuning, hardening, module configuration, control socket configuration, root hints, and no-chroot settings.
+
+## Cron Jobs
+
+`configure_cron.yml` installs `/root/.local/bin/optimize_FTL.sh` and replaces root's crontab from `roles/configure_cron/templates/crontab.j2`.
+
+Configured maintenance jobs include:
+
+- Restart Unbound after boot delay
+- Sync filesystem every 5 minutes
+- Update Pi-hole gravity daily
+- Optimize the FTL database weekly
+- Update Pi-hole daily
+- Clean old `/tmp` files weekly
+- Clean old `/var/log` files weekly
+
+## Firewall Rules
+
+UFW is configured with default deny incoming and default allow outgoing.
+
+| Rule | Port | Protocol | Source |
+|---|---:|---|---|
+| SSH | 22 | TCP | `lan_network` |
+| DNS | 53 | TCP and UDP | `lan_network` |
+| Pi-hole dashboard | 80 | TCP | `lan_network` |
+| NTP | 123 | UDP | `lan_network` |
+
+## Project Layout
+
+```text
+ansible-rpi/
+├── ansible.cfg
+├── inventory/
+│   └── inventory.ini
+├── setup_all.yml
+├── install_unbound.yml
+├── install_pihole.yml
+├── configure_unbound.yml
+├── configure_pihole.yml
+├── configure_ufw.yml
+├── configure_ntpd.yml
+├── configure_cron.yml
+├── start_all.yml
+├── stop_all.yml
+├── restart_all.yml
+├── backup_pihole.yml
+└── roles/
+    ├── common/
+    ├── install_unbound/
+    ├── configure_unbound/
+    ├── install_pihole/
+    ├── configure_pihole/
+    ├── configure_ufw/
+    ├── configure_ntpd/
+    ├── configure_cron/
+    ├── restart_stack/
+    └── get_pihole_backup/
+```
+
+## Notes
+
+- `configure_pihole.yml` assumes `roles/configure_pihole/files/pihole_teleporter.zip` exists.
+- `install_pihole.yml` already runs `configure_pihole` and `configure_cron`.
+- `install_unbound.yml` already runs `configure_unbound`.
+- The default Pi-hole web password in inventory is currently `admin`; change it before exposing the dashboard beyond a trusted LAN.
