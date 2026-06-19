@@ -13,7 +13,7 @@
         dest: "{{ unbound_config_dir }}/unbound.conf"
         owner: "{{ unbound_user }}"
         group: "{{ unbound_group }}"
-        mode: "0750"
+        mode: "0640"
 
     - name: Download root.hints file
       ansible.builtin.get_url:
@@ -21,7 +21,7 @@
         dest: "{{ unbound_config_dir }}/root.hints"
         owner: "{{ unbound_user }}"
         group: "{{ unbound_group }}"
-        mode: '0644'
+        mode: '0640'
 
     - name: Rebuild configuration directory unbound.conf.d
       ansible.builtin.file:
@@ -40,7 +40,7 @@
         dest: "{{ unbound_config_dir }}/unbound.conf.d/{{ item | basename | regex_replace('\\.j2$', '') }}"
         owner: "{{ unbound_user }}"
         group: "{{ unbound_group }}"
-        mode: "0750"
+        mode: "0640"
       with_fileglob:
         - "templates/unbound.conf.d/*.conf.j2"
 
