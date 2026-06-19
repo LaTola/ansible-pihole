@@ -1,28 +1,28 @@
-# Minimal working Unbound configuration
+# Base Unbound configuration
 
 server:
-    # Listen on port 5335 to avoid conflicts with system DNS
-    port: 5335        # Sets the listening port for DNS queries; uses 5335 instead of standard port 53 to avoid conflicts with system DNS services or other resolvers
+    # Listen on port 5335 to avoid conflicts with other DNS services
+    port: 5335        # DNS listen port
 
     # Listen on localhost only
-    interface: lo     # Binds Unbound to the loopback interface (127.0.0.1 and ::1) only; prevents exposure to external networks and accepts connections from localhost only
+    interface: lo     # Bind to loopback only
 
-    # Allow queries from localhost only
-    access-control: 127.0.0.1 allow    # Grants query permission to IPv4 localhost; blocks queries from any other IPv4 source
-    access-control: ::1 allow          # Grants query permission to IPv6 localhost; blocks queries from any other IPv6 source
+    # Allow queries only from localhost
+    access-control: 127.0.0.1 allow    # Allow IPv4 localhost
+    access-control: ::1 allow          # Allow IPv6 localhost
 
-    # Prevent DNS rebinding attacks by treating LAN network as private
-    private-address: {{ lan_network }} # Defines which IP ranges are considered private for DNS rebinding protection; prevents DNS responses from pointing to internal IP addresses, mitigating DNS rebinding attacks
+    # Treat the LAN network as private for rebinding protection
+    private-address: {{ lan_network }} # LAN range treated as private
 
     # DNS settings
-    do-ip4: yes       # Enables IPv4 support; allows Unbound to communicate over IPv4 for both listening and upstream queries
-    do-ip6: no        # Disable IPv6 support;
-    do-udp: yes       # Enables UDP transport for DNS; UDP is the default lightweight transport for DNS queries and responses
-    do-tcp: yes       # Enables TCP transport for DNS; required for large responses, DNSSEC, zone transfers, and fallback when UDP truncation occurs
+    do-ip4: yes       # Enable IPv4
+    do-ip6: no        # Disable IPv6
+    do-udp: yes       # Enable UDP
+    do-tcp: yes       # Enable TCP
 
     # Logging
-    verbosity: 1      # Sets logging detail level; 1 provides moderate logging (default level) - errors, warnings, and basic operational information
-    use-syslog: yes   # Sends log messages to syslog daemon instead of stderr; useful for centralized logging and daemonized operation
+    verbosity: 1      # Moderate logging
+    use-syslog: yes   # Log to syslog
 
 # Include additional config files
-include: "{{ unbound_config_dir }}/unbound.conf.d/*.conf"  # Loads all configuration files with .conf extension from the specified directory; allows modular configuration management by splitting settings across multiple files
+include: "{{ unbound_config_dir }}/unbound.conf.d/*.conf"  # Load modular config fragments

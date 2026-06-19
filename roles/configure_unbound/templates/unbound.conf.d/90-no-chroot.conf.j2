@@ -1,5 +1,5 @@
 server:
     # Disable chroot
-    chroot: ""                   # Disables chroot jail functionality; setting to empty string means Unbound runs without changing its root directory, useful for containerized environments or when running with non-root permissions
-    username: {{ unbound_user }}          # Specifies the user account that Unbound runs as after starting (with root privileges initially); drops privileges to this unprivileged user for security
-    directory: {{ unbound_config_dir }}   # Sets the working directory for Unbound; relative paths in configuration (like include files, key files, or zone files) are resolved relative to this directory
+    chroot: ""                   # Run without chroot
+    username: {{ unbound_user }}          # Run as the unbound user
+    directory: {{ unbound_config_dir }}   # Use the config directory as the working directory

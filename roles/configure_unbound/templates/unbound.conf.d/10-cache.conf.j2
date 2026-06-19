@@ -1,16 +1,28 @@
 server:    
-    # Cache Performance Tweaks
-    # Configure cache TTLs to balance freshness and performance
-    cache-min-ttl: 300          # Minimum time-to-live in seconds for cached records; overrides lower TTL values from DNS responses to reduce upstream queries; set to 300s (5 minutes) to balance freshness with cache efficiency
+    # Cache tuning
+    # Cache sizing for a 1 GB board
+    # Slabs should match num-threads and stay as powers of two
+    msg-cache-slabs: 2
+    rrset-cache-slabs: 2
+    infra-cache-slabs: 2
+    key-cache-slabs: 2
+
+    # Cache sizes tuned for Armbian
+    msg-cache-size: 16m
+    rrset-cache-size: 32m
+    infra-cache-numhosts: 5000
+
+    # Cache TTLs tuned to balance freshness and performance
+    cache-min-ttl: 60           # Minimum TTL for cached records; keeps caching modest and freshness reasonable
     
-    # Set a reasonable maximum TTL to prevent stale data from being served for too long
-    cache-max-ttl: 86400        # Maximum time-to-live in seconds for cached records; caps upper TTL values from DNS responses to prevent excessively long caching; set to 86400s (1 day) as a reasonable upper bound
+    # Cap maximum TTL to avoid overly stale data
+    cache-max-ttl: 86400        # Maximum TTL for cached records; capped at one day
 
-    # Enable serving expired records while fetching fresh ones to improve responsiveness
-    serve-expired: yes          # When enabled, immediately returns expired cache entries while simultaneously refreshing them in the background; improves perceived latency at the cost of potentially serving slightly stale data
+    # Serve expired records while refreshing in the background
+    serve-expired: yes          # Improve responsiveness at the cost of slightly stale data
 
-    # Enable prefetching of popular records to keep the cache warm and improve performance
-    prefetch: yes               # Automatically refreshes frequently-requested records before their TTL expires; keeps the cache warm and reduces latency for popular domains
+    # Prefetch popular records to keep the cache warm
+    prefetch: yes               # Reduce latency for frequently requested domains
 
-    # Serve expired replies when resolution takes longer than 1.0 seconds, in milliseconds
+    # Serve expired replies after one second
     serve-expired-client-timeout: 1000
