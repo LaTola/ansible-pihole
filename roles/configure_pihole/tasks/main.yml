@@ -5,9 +5,9 @@
   become_method: ansible.builtin.sudo
   notify: Restart pihole-FTL
   block:
-    - name: Copy /etc/hosts file
-      ansible.builtin.copy:
-        src: "files/hosts"
+    - name: Template /etc/hosts file
+      ansible.builtin.template:
+        src: "files/hosts.j2"
         dest: "/etc/hosts"
         mode: "0644"
 
