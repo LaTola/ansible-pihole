@@ -25,13 +25,13 @@
   block:
     - name: Ensure {{ ntp_package }} is installed
       ansible.builtin.package:
-        name: chrony
+        name: "{{ ntp_package }}"
         state: present
 
     - name: Configure {{ ntp_package }}
       ansible.builtin.template:
-        src: files/chrony.conf.j2
-        dest: /etc/chrony/chrony.conf
+        src: "templates/{{ ntp_package }}.conf.j2"
+        dest: "/etc/{{ ntp_package }}/{{ ntp_package }}.conf"
         owner: root
         group: root
         mode: '0644'

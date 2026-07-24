@@ -1,0 +1,32 @@
+# /etc/ntp.conf
+
+# Access control (Seguridad por defecto)
+restrict default kod nomodify notrap nopeer noquery limited
+restrict -6 default kod nomodify notrap nopeer noquery limited
+restrict 127.0.0.1
+restrict ::1
+
+# Permitir a la red local consultar la hora
+{% if lan_network is defined %}
+restrict {{ lan_network }} nomodify notrap
+{% endif %}
+
+# Fuentes NTP
+# Usamos 'pool' en lugar de 'server' para que ntpd asocie múltiples IPs
+pool {{ ntp_pool | default('south-america.pool.ntp.org') }} iburst
+
+# Drift file
+driftfile /var/lib/ntp/ntp.drift
+
+# Logging y Estadísticas
+logfile /var/log/ntp.log
+statsdir /var/log/ntpstats/
+statistics loopstats peerstats clockstats
+filegen loopstats file loopstats type day enable
+filegen peerstats file peerstats type day enable
+filegen clockstats file clockstats type day enable
+
+# Opcional: Emisión broadcast solo si tus clientes de la LAN están escuchando explícitamente paquetes broadcast
+{% if lan_network is defined %}
+broadcast {{ lan_network | ansible.utils.ipaddr('broadcast') }}
+{% endif %}
