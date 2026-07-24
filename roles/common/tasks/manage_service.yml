@@ -6,11 +6,11 @@
   become: true
   ansible.builtin.systemd:
     daemon_reload: true
-  when: 
+  when:
     - service_daemon_reload | default(false)
     - (service_name + '.service') in ansible_facts.services
 
-- name: "{{ service_state | capitalize }} service {{ service_name }}"
+- name: "Service {{ service_name }} - {{ service_state | capitalize }}"
   become: true
   ansible.builtin.systemd:
     name: "{{ service_name }}"

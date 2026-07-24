@@ -5,4 +5,3 @@
     name: "{{ item.name }}"
     state: "{{ item.state }}"
   loop: "{{ stack_order }}"
-  
