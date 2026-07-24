@@ -1,9 +1,9 @@
 #!/bin/bash
+set -e
 cd /etc/pihole
 systemctl stop pihole-FTL
-rm gravity_old.db
 sync
-for db in $(ls *.db)
+for db in $(ls *.db | grep -v "old")
 do
   # Full optimization
   sqlite3 $db "PRAGMA integrity_check; VACUUM; REINDEX; ANALYZE;"
