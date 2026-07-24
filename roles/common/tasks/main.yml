@@ -3,8 +3,8 @@
 - name: Include service management tasks
   ansible.builtin.include_tasks: manage_service.yml
   # You can add a conditional so it only runs when variables are provided
-  when: 
-    - service_unit.stat.exists 
-    - service_name is defined 
-    - service_state is defined 
+  when:
+    - service_unit.stat.exists
+    - service_name is defined
+    - service_state is defined
     - service_action is defined
