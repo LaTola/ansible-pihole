@@ -69,7 +69,7 @@
 
     - name: Check if Pi-hole is already installed
       ansible.builtin.stat:
-        path: /usr/local/bin/pihole
+        path: "{{ pihole_bin_dir }}/pihole"
       register: pihole_binary
 
     - name: Run the Pi-hole installer in non-interactive mode
@@ -87,7 +87,7 @@
       ansible.builtin.systemd:
         name: pihole-FTL
         state: started
-        enabled: yes
+        enabled: true
 
     - name: Clean up installer script
       ansible.builtin.file:
