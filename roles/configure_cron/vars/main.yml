@@ -2,18 +2,18 @@
 
 ## Cron config
 configure_cron_jobs:
-  - name: "This unbound restart avoid bogus resolver status after reboot"
-    minute: "@reboot"
-    command: "sleep 120 && systemctl restart unbound"
+  # - name: "This unbound restart avoid bogus resolver status after reboot"
+  #   minute: "@reboot"
+  #   command: "sleep 120 && systemctl restart unbound"
 
   - name: "Sync FileSystem"
-    minute: "*/5"
+    minute: "*/10"
     command: "/usr/bin/sync"
 
   - name: "Update Gravity"
     minute: "00"
     hour: "04"
-    command: "/usr/local/bin/pihole -g"
+    command: "{{ pihole_bin_dir }}/pihole -g"
 
   - name: "Optimize FTL Database"
     hour: "03"
@@ -24,7 +24,7 @@ configure_cron_jobs:
   - name: "Update Pi-hole"
     minute: "00"
     hour: "02"
-    command: "/usr/local/bin/pihole -up > /var/log/pihole/piholeUpdate.log 2>&1"
+    command: "{{ pihole_bin_dir }}/pihole -up > /var/log/pihole/piholeUpdate.log 2>&1"
 
   - name: "Cleanup tmp"
     minute: "00"
