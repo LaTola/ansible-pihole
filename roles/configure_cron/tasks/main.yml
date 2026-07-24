@@ -9,6 +9,7 @@
         path: "{{ configure_cron_scripts_root }}"
         state: directory
         owner: root
+        mode: "0750"
 
     - name: Install maintenance scripts
       ansible.builtin.copy:
