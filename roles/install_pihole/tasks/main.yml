@@ -22,6 +22,8 @@
           - curl
           - git
           - netcat-openbsd
+          - sqlite3
+          - dnsutils
         state: present
 
     - name: Ensure /etc/pihole directory exists
@@ -37,7 +39,7 @@
       ansible.builtin.copy:
         dest: /etc/pihole/setupVars.conf
         content: |
-          PIHOLE_INTERFACE=eth0
+          PIHOLE_INTERFACE={{ host_interface }}
           IPV4_ADDRESS={{ ansible_host }}/24
           IPV6_ADDRESS=
           QUERY_LOGGING=true
@@ -54,8 +56,6 @@
           API_EXCLUDE_CLIENTS=
           API_QUERY_LOG_SHOW=all
           API_PRIVACY_MODE=false
-          PIHOLE_DNS_1=1.1.1.1
-          PIHOLE_DNS_2=8.8.8.8
           WEBPASSWORD={{ pihole_default_webpassword | hash('sha256') }}
         mode: '0644'
         owner: root
