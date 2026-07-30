@@ -3,10 +3,6 @@
 ## Cron config
 configure_cron_jobs:
 
-  - name: "Sync FileSystem"
-    minute: "*/10"
-    command: "/usr/bin/sync"
-
   - name: "Update Gravity"
     minute: "00"
     hour: "04"
@@ -22,17 +18,5 @@ configure_cron_jobs:
     minute: "00"
     hour: "02"
     command: "{{ pihole_bin_dir }}/pihole -up > /var/log/pihole/piholeUpdate.log 2>&1"
-
-  # - name: "Cleanup tmp"
-  #   minute: "00"
-  #   hour: "01"
-  #   weekday: "0"
-  #   command: "/usr/bin/find /tmp -type f -mtime +7 -delete"
-
-  # - name: "Cleanup logs"
-  #   minute: "00"
-  #   hour: "00"
-  #   weekday: "0"
-  #   command: "/usr/bin/find /var/log/ -type f -mtime +7 -delete"
 
 configure_cron_scripts_root: "/root/.local/bin"
