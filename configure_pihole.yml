@@ -1,7 +1,7 @@
 ---
 
 - name: Configure pihole-FTL
-  hosts: raspberrypi
+  hosts: pihole
   gather_facts: false
 
   handlers:

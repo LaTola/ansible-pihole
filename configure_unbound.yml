@@ -1,7 +1,7 @@
 ---
 
 - name: Configure unbound Server
-  hosts: raspberrypi
+  hosts: pihole
   gather_facts: false
 
   handlers:

@@ -1,6 +1,6 @@
 ---
 - name: Stop all DNS services
-  hosts: raspberrypi
+  hosts: pihole
   gather_facts: false
 
   vars:

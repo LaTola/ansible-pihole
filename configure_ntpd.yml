@@ -1,6 +1,6 @@
 ---
 - name: Configure NTPD
-  hosts: raspberrypi
+  hosts: pihole
   gather_facts: false
 
   handlers:

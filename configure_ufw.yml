@@ -1,6 +1,6 @@
 ---
 - name: Configure UFW Firewall
-  hosts: raspberrypi
+  hosts: pihole
   gather_facts: false
 
   roles:

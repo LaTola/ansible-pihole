@@ -1,0 +1,8 @@
+---
+---
+- name: Configure log rotation
+  hosts: pihole
+  gather_facts: false
+
+  roles:
+    - role: configure_cron
