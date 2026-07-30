@@ -1,0 +1,24 @@
+---
+- name: Configure log rotation for Pi-hole and system temporary files
+  become: true
+  become_method: ansible.builtin.sudo
+  block:
+    - name: Push systemd-tmpfiles configuration for /tmp and /var/tmp maintenance
+      ansible.builtin.template:
+        src: tmp.conf.j2
+        dest: "{{ systemd_tmpfiles_config_dir }}/{{ systemd_tmpfiles_config_file }}"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Push logrotate configuration for Pi-hole logs
+      ansible.builtin.template:
+        src: pihole.j2
+        dest: "{{ pihole_logrotate_config_dir }}/{{ pihole_logrotate_config_file }}"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
