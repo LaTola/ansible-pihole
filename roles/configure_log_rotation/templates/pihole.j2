@@ -1,0 +1,19 @@
+/var/log/pihole/*.log* {
+    daily
+    copytruncate
+    rotate {{ pihole_logrotate_days }}
+    compress
+    delaycompress
+    notifempty
+    missingok
+}
+
+/var/log.hdd/pihole/* {
+    daily
+    copytruncate
+    rotate {{ pihole_logrotate_days }}
+    compress
+    delaycompress
+    notifempty
+    missingok
+}
