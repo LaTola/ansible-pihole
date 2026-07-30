@@ -6,3 +6,5 @@
   ansible.builtin.import_playbook: install_pihole.yml
 - name: Configure UFW
   ansible.builtin.import_playbook: configure_ufw.yml
+- name: Configure log rotation
+  ansible.builtin.import_playbook: configure_log_rotation.yml
