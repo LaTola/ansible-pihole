@@ -160,14 +160,12 @@ The role writes `/etc/unbound/unbound.conf`, downloads `root.hints`, rebuilds `/
 
 The cron role installs the script [roles/configure_cron/files/optimize_FTL.sh](roles/configure_cron/files/optimize_FTL.sh) and deploys the scheduled tasks from [roles/configure_cron/templates/crontab.j2](roles/configure_cron/templates/crontab.j2).
 
-The current maintenance schedule includes:
+The current maintenance schedule defined in [roles/configure_cron/vars/main.yml](roles/configure_cron/vars/main.yml) includes:
 
-- filesystem sync every 10 minutes
-- daily Pi-hole gravity update
-- weekly FTL database optimization
-- daily Pi-hole update
-- weekly cleanup of old files in `/tmp`
-- weekly cleanup of old files in `/var/log`
+- daily Pi-hole gravity update at 04:00
+- weekly FTL database optimization every Monday at 03:00
+- daily Pi-hole update at 02:00, with output redirected to `/var/log/pihole/piholeUpdate.log`
+
 
 ## Log rotation
 
