@@ -26,10 +26,10 @@
           - dnsutils
         state: present
 
-    - name: Ensure /etc/pihole directory exists
+    - name: "Ensure {{ pihole_root_dir }} directory exists"
       become: true
       ansible.builtin.file:
-        path: /etc/pihole
+        path: "{{ pihole_root_dir }}"
         state: directory
         mode: '0755'
 
@@ -37,7 +37,7 @@
       become: true
       become_method: ansible.builtin.sudo
       ansible.builtin.copy:
-        dest: /etc/pihole/setupVars.conf
+        dest: "{{ pihole_root_dir }}/setupVars.conf"
         content: |
           PIHOLE_INTERFACE={{ host_interface }}
           IPV4_ADDRESS={{ ansible_host }}/24
@@ -68,8 +68,10 @@
         mode: '0755'
 
     - name: Check if Pi-hole is already installed
-      ansible.builtin.stat:
-        path: "{{ pihole_bin_dir }}/pihole"
+      ansible.builtin.command:
+        dpkg-query -W pihole-meta
+      failed_when: false
+      changed_when: false
       register: pihole_binary
 
     - name: Run the Pi-hole installer in non-interactive mode
@@ -79,7 +81,7 @@
         /tmp/pi-hole-installer.sh --unattended --web-password "{{ pihole_default_webpassword }}"
       environment:
         TERM: xterm-256color
-      when: not pihole_binary.stat.exists
+      when: pihole_binary.rc != 0
       changed_when: true
       no_log: true
 
