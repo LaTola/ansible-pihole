@@ -8,7 +8,7 @@ on:
       - 'roles/configure_unbound/templates/**'
 jobs:
   run-configure-unbound:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
