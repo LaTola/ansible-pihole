@@ -5,7 +5,9 @@
   block:
     - name: Generate pihole teleporter file
       ansible.builtin.command:
-        cmd: pihole-FTL --teleporter
+        argv:
+          - pihole-FTL
+          - --teleporter
       args:
         chdir: "{{ pihole_teleporter_dest }}"
       register: pihole_export

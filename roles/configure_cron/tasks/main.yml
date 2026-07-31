@@ -30,7 +30,12 @@
         mode: "0644"
 
     - name: Install new crontab
-      ansible.builtin.command: "crontab -u root /tmp/crontab"
+      ansible.builtin.command:
+        argv:
+          - crontab
+          - -u
+          - root
+          - /tmp/crontab
       changed_when: false
 
     - name: Remove temporary crontab file

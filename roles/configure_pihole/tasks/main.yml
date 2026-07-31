@@ -33,14 +33,19 @@
 
     - name: Import pihole teleporter file
       ansible.builtin.command:
-        cmd: "pihole-FTL --teleporter {{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
+        argv:
+          - pihole-FTL
+          - --teleporter
+          - "{{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
       register: pihole_import
       changed_when: pihole_import.rc != 0 # <- Uses the return code to define when the task has changed.
 
     - name: Update gravity DB
       become: true
       ansible.builtin.command:
-        cmd: pihole -g
+        argv:
+          - pihole
+          - -g
       register: pihole_gravity_update
       async: 1200
       poll: 0

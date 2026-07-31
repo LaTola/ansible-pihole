@@ -1,6 +1,10 @@
 ---
 - name: Check if Unbound is already installed
-  ansible.builtin.command: dpkg-query -W unbound
+  ansible.builtin.command:
+    argv:
+      - dpkg-query
+      - -W
+      - unbound
   register: unbound_installed
   failed_when: false
   changed_when: false
