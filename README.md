@@ -4,7 +4,8 @@
 ![Armbian](https://img.shields.io/badge/Armbian-DD4814?style=flat&logo=armbian&logoColor=white)
 ![Orange Pi Zero 3](https://img.shields.io/badge/Orange%20Pi%20Zero%203-FF7900?style=flat&logo=orangepi&logoColor=white)
 ![Pi-hole](https://img.shields.io/badge/Pi--hole-96060C?style=flat&logo=pihole&logoColor=white)
-![Platform](https://img.shields.io/badge/platform-ARM64-lightgrey?style=flat)
+![Platform](https://img.shields.io/badge/Platform-ARM64-lightgrey?style=flat&logo=linux&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-enabled-brightgreen?style=flat&logo=github-actions&logoColor=white)
 
 This repository contains Ansible playbooks to provision an Orange Pi Zero 3 running Armbian as a small self-hosted DNS stack. The current implementation installs and configures:
 
@@ -214,6 +215,8 @@ UFW is configured with default deny incoming and default allow outgoing policies
 
 ```text
 ansible-rpi/
+├── .github/
+│   └── workflows/
 ├── ansible.cfg
 ├── inventory/
 │   └── inventory.ini
@@ -243,6 +246,22 @@ ansible-rpi/
     ├── install_unbound/
     └── restart_stack/
 ```
+
+## GitHub Actions workflows
+
+This repository includes GitHub Actions workflows that deploy specific Ansible playbooks whenever related repository files change. The workflows are configured to run on `self-hosted` runners and assume Ansible is already installed on the runner.
+
+| Workflow file | Trigger | Playbook run | Purpose |
+|---|---|---|---|
+| `.github/workflows/configure-cron.yml` | push to `main` when `roles/configure_cron/**` changes | `ansible-playbook configure_cron.yml` | Apply cron maintenance configuration |
+| `.github/workflows/configure-ufw.yml` | push to `main` when `roles/configure_ufw/tasks/**` changes | `ansible-playbook configure_ufw.yml` | Apply firewall/UFW configuration |
+| `.github/workflows/configure-ntpd.yml` | push to `main` when `roles/configure_ntpd/**` changes | `ansible-playbook configure_ntpd.yml` | Apply NTP/chrony configuration |
+| `.github/workflows/configure-log-rotation.yml` | push to `main` when `roles/configure_log_rotation/**` changes | `ansible-playbook configure_log_rotation.yml` | Apply log rotation and tmpfiles configuration |
+| `.github/workflows/configure-unbound.yml` | push to `main` when `roles/configure_unbound/templates/**` changes | `ansible-playbook configure_unbound.yml` | Apply Unbound DNS resolver configuration |
+
+Each workflow checks out the repository and runs the corresponding playbook, then performs a workspace cleanup step to remove files from the runner workspace.
+
+> These workflows are configured for `self-hosted` runners and assume Ansible is already installed on the runner host.
 
 ## Notes
 
