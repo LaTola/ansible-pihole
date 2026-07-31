@@ -10,7 +10,7 @@ jobs:
   run-configure-unbound:
     runs-on: self-hosted
     env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
