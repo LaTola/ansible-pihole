@@ -1,5 +1,4 @@
 ---
-
 - name: Check if Pi-hole is already installed
   ansible.builtin.command:
     argv:
@@ -31,15 +30,12 @@
         state: present
 
     - name: "Ensure {{ pihole_root_dir }} directory exists"
-      become: true
       ansible.builtin.file:
         path: "{{ pihole_root_dir }}"
         state: directory
         mode: '0755'
 
     - name: Create Pi-hole setupVars.conf
-      become: true
-      become_method: ansible.builtin.sudo
       ansible.builtin.copy:
         dest: "{{ pihole_root_dir }}/setupVars.conf"
         content: |
@@ -72,8 +68,6 @@
         mode: '0755'
 
     - name: Run the Pi-hole installer in non-interactive mode
-      become: true
-      become_method: ansible.builtin.sudo
       ansible.builtin.shell: |
         /tmp/pi-hole-installer.sh --unattended --web-password "{{ pihole_default_webpassword }}"
       environment:
