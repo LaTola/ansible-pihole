@@ -1,0 +1,37 @@
+name: Deploy configure-cron Ansible Playbook
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'roles/configure_cron/**'
+
+jobs:
+  run-configure-cron:
+    runs-on: self-hosted
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+## Removed the setup-python and ansible installation steps since the runner already has Ansible installed
+      # - name: Set up Python
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: '3.x'
+
+      # - name: Install Ansible
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     pip install ansible
+
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook configure_cron.yml
+
+      - name: Cleanup workspace
+        if: always()
+        run: |
+          echo "Cleanup workspace..."
+          rm -rf "${{ github.workspace }}"/*
+          rm -rf "${{ github.workspace }}"/.[!.]*
