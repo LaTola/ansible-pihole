@@ -22,3 +22,24 @@
     - name: Reload systemd
       ansible.builtin.systemd:
         daemon_reload: true
+
+    - name: Ensure journalctl custom config directory exists
+      ansible.builtin.file:
+        path: "{{ journalctl_config_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Push systemd journal configuration for log rotation
+      ansible.builtin.template:
+        src: 00-arm-optimized.conf.j2
+        dest: "{{ journalctl_config_dir }}/{{ journalctl_config_file }}"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart systemd-journald service to apply new configuration
+      ansible.builtin.systemd:
+        name: systemd-journald
+        state: restarted

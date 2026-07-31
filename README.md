@@ -13,7 +13,7 @@ This repository contains Ansible playbooks to provision an Orange Pi Zero 3 runn
 - UFW as a host firewall restricted to the local LAN
 - chrony or ntp for time synchronization
 - a root crontab for maintenance tasks and periodic updates
-- log rotation for Pi-hole logs and temporary directories
+- log rotation for Pi-hole logs, temporary directories, and systemd journal settings
 - service start/stop/restart helpers for the DNS stack
 
 ## Current stack behavior
@@ -76,6 +76,17 @@ The relevant variables currently configured are:
 | `var_tmp_retention_days` | `7` | Retention period for temporary files under `/var/tmp` |
 | `systemd_tmpfiles_config_dir` | `/etc/tmpfiles.d` | Directory for tmpfiles.d maintenance rules |
 | `systemd_tmpfiles_config_file` | `tmp.conf` | tmpfiles configuration file name |
+| `journalctl_config_dir` | `/etc/systemd/journald.conf.d` | Directory for custom journald config |
+| `journalctl_config_file` | `00-arm-optimized.conf` | Journald config filename |
+| `journalctl_storage` | `volatile` | Journald storage mode |
+| `journalctl_max_use` | `32M` | Maximum journald runtime storage size |
+| `journalctl_max_file_size` | `8M` | Maximum journald file size |
+| `journalctl_compress` | `no` | Journald compression setting |
+| `journalctl_rate_limit_interval` | `30s` | Journald rate limit interval |
+| `journalctl_rate_limit_burst` | `200` | Journald rate limit burst |
+| `journalctl_audit` | `no` | Journald audit logging enabled |
+| `journalctl_ForwardToWall` | `no` | Journald forwarding to wall |
+| `journalctl_ForwardToSyslog` | `no` | Journald forwarding to syslog |
 | `unbound_config_dir` | `/etc/unbound` | Main Unbound configuration directory |
 
 ## Common usage
@@ -169,12 +180,24 @@ The current maintenance schedule defined in [roles/configure_cron/vars/main.yml]
 
 ## Log rotation
 
-The optional [configure_log_rotation.yml](configure_log_rotation.yml) playbook installs log rotation and tmpfiles maintenance rules for the host. It deploys:
+The optional [configure_log_rotation.yml](configure_log_rotation.yml) playbook installs log rotation and tmpfiles maintenance rules for the host, plus a custom `systemd-journald` configuration.
+
+It deploys:
 
 - a Pi-hole logrotate configuration under `/etc/logrotate.d/pihole`
 - tmpfiles rules under `/etc/tmpfiles.d/tmp.conf` to manage `/tmp` and `/var/tmp` retention
+- a custom journald configuration under `/etc/systemd/journald.conf.d/00-arm-optimized.conf`
 
-This is useful for keeping Pi-hole logs and temporary directories from growing indefinitely on the device.
+The journald settings are optimized for a low-power ARM device and include:
+
+- volatile storage in RAM
+- max runtime log size of `32M`
+- per-file limit of `8M`
+- compression disabled
+- rate limiting for log floods
+- disabled audit and forwarding to wall/syslog
+
+This playbook keeps Pi-hole logs, temporary directories, and the journal from growing unbounded on the device.
 
 ## Firewall rules
 

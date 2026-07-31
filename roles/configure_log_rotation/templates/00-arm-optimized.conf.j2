@@ -1,0 +1,19 @@
+[Journal]
+# 1. Store logs in RAM (tmpfs) to eliminate flash wear and IO latency
+Storage={{ journalctl_storage }}
+
+# 2. Limit RAM consumption (since volatile logs live in memory)
+RuntimeMaxUse={{ journalctl_max_use }}
+RuntimeMaxFileSize={{ journalctl_max_file_size }}
+
+# 3. Disable heavy compression to save weak CPU cycles (or use LZ4 if space is tight)
+Compress={{ journalctl_compress }}
+
+# 4. Strict rate limiting to protect CPU during crash loops
+RateLimitIntervalSec={{ journalctl_rate_limit_interval}}
+RateLimitBurst={{ journalctl_rate_limit_burst }}
+
+# 5. Disable unnecessary logging sources and forwarding overhead
+Audit={{ journalctl_audit }}
+ForwardToWall={{ journalctl_ForwardToWall }}
+ForwardToSyslog={{ journalctl_ForwardToSyslog }}
