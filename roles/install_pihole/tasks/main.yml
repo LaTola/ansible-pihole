@@ -33,7 +33,7 @@
       ansible.builtin.file:
         path: "{{ pihole_root_dir }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Create Pi-hole setupVars.conf
       ansible.builtin.copy:
@@ -57,7 +57,7 @@
           API_QUERY_LOG_SHOW=all
           API_PRIVACY_MODE=false
           WEBPASSWORD={{ pihole_default_webpassword | hash('sha256') }}
-        mode: '0644'
+        mode: "0644"
         owner: root
         group: root
 
@@ -65,7 +65,7 @@
       ansible.builtin.get_url:
         url: https://install.pi-hole.net
         dest: /tmp/pi-hole-installer.sh
-        mode: '0755'
+        mode: "0755"
 
     - name: Run the Pi-hole installer in non-interactive mode
       ansible.builtin.shell: |
