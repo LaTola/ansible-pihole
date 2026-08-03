@@ -7,7 +7,7 @@
   block:
     - name: Template /etc/hosts file
       ansible.builtin.template:
-        src: "files/hosts.j2"
+        src: "templates/hosts.j2"
         dest: "/etc/hosts"
         mode: "0644"
 
@@ -18,12 +18,12 @@
         mode: "0755"
 
     - name: Copy pihole-FTL service override configuration files
-      ansible.builtin.copy:
-        src: "{{ item }}"
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
         dest: "{{ systemd_unit_dir }}/pihole-FTL.service.d/{{ item | basename }}"
         mode: "0644"
-      with_fileglob:
-        - "files/pihole-FTL.service.d/*.conf"
+      loop:
+        - "templates/99-unbound-dependency.conf"
 
     - name: Copy pihole teleporter file
       ansible.builtin.copy:
@@ -38,7 +38,7 @@
           - --teleporter
           - "{{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
       register: pihole_import
-      changed_when: pihole_import.rc != 0 # <- Uses the return code to define when the task has changed.
+      changed_when: pihole_import.rc != 0 
 
     - name: Update gravity DB
       become: true
