@@ -12,14 +12,12 @@
         mode: "0750"
 
     - name: Install maintenance scripts
-      ansible.builtin.copy:
-        src: "{{ item }}"
-        dest: "{{ configure_cron_scripts_root }}/{{ item }}"
+      ansible.builtin.template:
+        src: "templates/optimize_FTL.sh.j2"
+        dest: "{{ configure_cron_scripts_root }}/optimize_FTL.sh"
         owner: root
         group: root
         mode: "0750"
-      loop:
-        - optimize_FTL.sh
 
     - name: Deploy crontab from Jinja2 template
       ansible.builtin.template:
