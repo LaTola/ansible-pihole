@@ -4,7 +4,7 @@
   become: true
   become_method: ansible.builtin.sudo
   block:
-    - name: Ensure {{ ntp_package }} is installed
+    - name: Ensure {{ ntp_package }} (ntp)is installed
       ansible.builtin.package:
         name: ntp
         state: present
