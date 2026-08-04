@@ -1,8 +1,13 @@
 ---
+- name: Check if teleporter file exists
+  ansible.builtin.stat:
+    path: "files/{{ pihole_teleporter_filename }}"
+  register: teleporter_file
 
 - name: Restore pi-hole
   become: true
   become_method: ansible.builtin.sudo
+  when: teleporter_file.stat.exists
   block:
     - name: Template /etc/hosts file
       ansible.builtin.template:
