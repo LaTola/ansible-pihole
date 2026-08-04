@@ -1,9 +1,8 @@
 ---
 
-- name: Configure pi-hole
+- name: Restore pi-hole
   become: true
   become_method: ansible.builtin.sudo
-  notify: Restart pihole-FTL
   block:
     - name: Template /etc/hosts file
       ansible.builtin.template:
@@ -15,7 +14,7 @@
       ansible.builtin.file:
         path: "{{ systemd_unit_dir }}/pihole-FTL.service.d"
         state: directory
-        mode: "0755"
+        mode: "0644"
 
     - name: Copy pihole-FTL service override configuration files
       ansible.builtin.template:
