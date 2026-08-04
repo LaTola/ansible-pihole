@@ -1,11 +1,12 @@
 # {{ ansible_managed }}
 #!/bin/bash
-set -e
+sync
 cd /etc/pihole
 systemctl stop pihole-FTL
 for db in $(ls *.db | grep -v "old")
 do
   # Full optimization
-  sqlite3 $db "PRAGMA integrity_check; VACUUM; REINDEX; ANALYZE;"
+  result=$(sqlite3 $db "PRAGMA integrity_check; VACUUM; PRAGMA optimize;")
+  echo "$db optimization: $result"
 done
 systemctl start pihole-FTL
