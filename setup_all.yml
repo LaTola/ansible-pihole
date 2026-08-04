@@ -4,7 +4,12 @@
   ansible.builtin.import_playbook: install_unbound.yml
 - name: Install Pi-hole
   ansible.builtin.import_playbook: install_pihole.yml
+- name: Restore pi-hole
+  ansible.builtin.import_playbook: restore_pihole.yml
 - name: Configure UFW
   ansible.builtin.import_playbook: configure_ufw.yml
+- name: Configure ntpd
+  ansible.builtin.import_playbook: configure_ntpd.yml
 - name: Configure log rotation
   ansible.builtin.import_playbook: configure_log_rotation.yml
+
