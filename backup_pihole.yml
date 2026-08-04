@@ -5,4 +5,4 @@
   gather_facts: false
 
   roles:
-    - role: get_pihole_backup
+    - role: backup_pihole
