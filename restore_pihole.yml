@@ -1,0 +1,9 @@
+---
+
+- name: Restore pihole backup
+  hosts: pihole
+  gather_facts: false
+
+  roles:
+    - role: restore_pihole
+    - role: configure_cron

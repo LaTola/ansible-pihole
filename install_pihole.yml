@@ -9,5 +9,5 @@
 
   roles:
     - role: install_pihole
-    - role: configure_pihole
+    - role: restore_pihole
     - role: configure_cron
