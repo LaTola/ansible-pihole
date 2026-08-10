@@ -1,15 +1,7 @@
 # {{ ansible_managed }}
-/var/log/pihole/*.log* {
-    daily
-    copytruncate
-    rotate {{ pihole_logrotate_days }}
-    compress
-    delaycompress
-    notifempty
-    missingok
-}
-
-/var/log.hdd/pihole/* {
+/var/log.hdd/pihole/*
+/var/log/pihole/*
+{
     daily
     copytruncate
     rotate {{ pihole_logrotate_days }}
