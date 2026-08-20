@@ -1,12 +1,15 @@
 # {{ ansible_managed }}
-/var/log.hdd/pihole/*.log 
 /var/log/pihole/*.log
+/var/log.hdd/pihole/*.log 
 {
     daily
-    rotate {{ pihole_logrotate_days }}
-    copytruncate
+    rotate 7
     compress
     delaycompress
-    notifempty
     missingok
+    notifempty
+    sharedscripts
+    postrotate
+        /usr/lib/rsyslog/rsyslog-rotate
+    endscript
 }
