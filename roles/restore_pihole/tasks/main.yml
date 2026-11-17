@@ -1,38 +1,47 @@
 ---
 - name: Check if teleporter file exists
   ansible.builtin.stat:
-    path: "files/{{ pihole.teleporter.filename }}"
+    path: "{{ role_path }}/files/{{ pihole.teleporter.filename }}"
   register: restore_pihole_teleporter_file
+  delegate_to: localhost
+  become: false
 
 - name: Restore pi-hole
   become: true
   become_method: ansible.builtin.sudo
-  when: restore_pihole_teleporter_file.stat.exists
+  when: restore_pihole_teleporter_file.stat.isreg | default(false)
   block:
     - name: Template /etc/hosts file
       ansible.builtin.template:
-        src: "templates/hosts.j2"
-        dest: "/etc/hosts"
+        src: hosts.j2
+        dest: /etc/hosts
+        owner: root
+        group: root
         mode: "0644"
 
     - name: Ensure pihole-FTL service override directory exists
       ansible.builtin.file:
         path: "{{ systemd.unit_dir }}/pihole-FTL.service.d"
         state: directory
-        mode: "0644"
+        owner: root
+        group: root
+        mode: "0755"
 
-    - name: Copy pihole-FTL service override configuration files
+    - name: Copy pihole-FTL service override configuration
       ansible.builtin.template:
-        src: "{{ item }}.j2"
-        dest: "{{ systemd.unit_dir }}/pihole-FTL.service.d/{{ item | basename }}"
+        src: 99-unbound-dependency.conf.j2
+        dest: "{{ systemd.unit_dir }}/pihole-FTL.service.d/99-unbound-dependency.conf"
+        owner: root
+        group: root
         mode: "0644"
-      loop:
-        - "templates/99-unbound-dependency.conf"
+      notify: Reload systemd daemon
 
     - name: Copy pihole teleporter file
       ansible.builtin.copy:
-        src: "files/{{ pihole.teleporter.filename }}"
+        src: "{{ role_path }}/files/{{ pihole.teleporter.filename }}"
         dest: "{{ pihole.teleporter.dest }}/{{ pihole.teleporter.filename }}"
+        owner: root
+        group: root
         mode: "0644"
 
     - name: Import pihole teleporter file
@@ -41,11 +50,9 @@
           - pihole-FTL
           - --teleporter
           - "{{ pihole.teleporter.dest }}/{{ pihole.teleporter.filename }}"
-      register: restore_pihole_import
-      changed_when: restore_pihole_import.rc != 0
+      changed_when: true
 
     - name: Update gravity DB
-      become: true
       ansible.builtin.command:
         argv:
           - pihole
@@ -53,25 +60,28 @@
       register: restore_pihole_gravity_update
       async: 1200
       poll: 0
+      changed_when: true
 
     - name: Wait for gravity DB update to complete
       ansible.builtin.async_status:
         jid: "{{ restore_pihole_gravity_update.ansible_job_id }}"
       register: restore_pihole_gravity_job_result
-      until: restore_pihole_gravity_job_result.finished
-      retries: 40
-      delay: 30
-      changed_when: restore_pihole_gravity_job_result.rc == 0
+      until: restore_pihole_gravity_job_result.finished | bool
+      retries: 120
+      delay: 10
+      changed_when: false
 
+  always:
     - name: Remove pihole teleporter file
       ansible.builtin.file:
         path: "{{ pihole.teleporter.dest }}/{{ pihole.teleporter.filename }}"
         state: absent
 
-    - name: Wait for gravity update to complete
+    - name: Clean up gravity async job metadata
       ansible.builtin.async_status:
         jid: "{{ restore_pihole_gravity_update.ansible_job_id }}"
-      register: restore_pihole_gravity_update_status
-      until: restore_pihole_gravity_update_status.finished
-      retries: 100
-      delay: 10
+        mode: cleanup
+      when:
+        - restore_pihole_gravity_update is defined
+        - restore_pihole_gravity_update.ansible_job_id is defined
+      changed_when: false
