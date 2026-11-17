@@ -1,4 +1,15 @@
 ---
+- name: Validate LAN network
+  ansible.builtin.assert:
+    that:
+      - lan.network is defined
+      - lan.network is string
+      - "'/' in lan.network"
+      - (lan.network | ansible.utils.ipv4('net')) is not false
+    fail_msg: >-
+      lan.network must be a valid IPv4 network in CIDR notation
+      with no host bits set, for example "192.168.10.0/24".
+
 - name: Configure UFW Firewall
   become: true
   become_method: ansible.builtin.sudo

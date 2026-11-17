@@ -1,6 +1,13 @@
 ---
-## DO NOT Change the handlers order because it will impact the order services get restarted
 
+- name: Validate ntp.package setting
+  ansible.builtin.assert:
+    that:
+      - ntp.package is defined
+      - ntp.package in ['chrony', 'ntp']
+    fail_msg: "NTP package must be either 'chrony' or 'ntp'."
+
+## DO NOT Change the handlers order because it will impact the order services get restarted
 - name: Restart unbound
   ansible.builtin.include_tasks: ../tasks/manage_service.yml
   vars:

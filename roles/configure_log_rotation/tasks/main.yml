@@ -1,4 +1,66 @@
 ---
+
+- name: Validate journalctl storage settings
+  ansible.builtin.assert:
+    that:
+      - journalctl.storage in ['volatile', 'persistent', 'auto', 'none']
+    fail_msg: "Journalctl storage must be one of 'volatile', 'persistent', 'auto', or 'none'."
+
+- name: Validate journalctl max_use setting
+  ansible.builtin.assert:
+    that:
+      - journalctl.max_use is defined
+      - journalctl.max_use is string
+      - journalctl.max_use is match('^[1-9][0-9]*[KMGTPE]?$')
+    fail_msg: >-
+      journalctl.max_use should be a string representing a size in bytes, optionally followed by K, M, G, T, P, or E.
+      Examples: "52428800", "50M", "1G".
+
+- name: Validate journalctl max_file_size setting
+  ansible.builtin.assert:
+    that:
+      - journalctl.max_file_size is defined
+      - journalctl.max_file_size is string
+      - journalctl.max_file_size is match('^[1-9][0-9]*[KMGTPE]?$')
+    fail_msg: >-
+      journalctl.max_file_size should be a string representing a size in bytes, optionally followed by K, M, G, T, P, or E.
+      Examples: "8M", "128M", "1G".
+
+- name: Validate journalctl compress setting
+  ansible.builtin.assert:
+    that:
+      - journalctl.compress in ['yes', 'no']
+    fail_msg: "Journalctl compress must be either 'yes' or 'no'."
+
+- name: Validate journalctl rate_limit settings
+  ansible.builtin.assert:
+    that:
+      - journalctl.rate_limit.interval is defined
+      - journalctl.rate_limit.burst is defined
+      - journalctl.rate_limit.interval is string
+      - journalctl.rate_limit.burst is integer
+    fail_msg: >-
+      Journalctl rate_limit settings must include a valid interval (string) and burst (integer).
+      Example: interval: "30s", burst: 200.
+
+- name: Validate journalctl audit setting
+  ansible.builtin.assert:
+    that:
+      - journalctl.audit in ['yes', 'no']
+    fail_msg: "Journalctl audit must be either 'yes' or 'no'."
+
+- name: Validate journalctl ForwardToWall setting
+  ansible.builtin.assert:
+    that:
+      - journalctl.ForwardToWall in ['yes', 'no']
+    fail_msg: "Journalctl ForwardToWall must be either 'yes' or 'no'."
+
+- name: Validate journalctl ForwardToSyslog setting
+  ansible.builtin.assert:
+    that:
+      - journalctl.ForwardToSyslog in ['yes', 'no']
+    fail_msg: "Journalctl ForwardToSyslog must be either 'yes' or 'no'."
+
 - name: Configure log rotation for Pi-hole and system temporary files
   become: true
   become_method: ansible.builtin.sudo
