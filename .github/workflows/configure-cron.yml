@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - 'roles/configure_cron/**'
+      - 'configure_cron.yml'
 
 jobs:
   run-configure-cron:

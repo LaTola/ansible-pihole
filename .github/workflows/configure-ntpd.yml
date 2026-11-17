@@ -5,6 +5,8 @@ on:
       - main
     paths:
       - 'roles/configure_ntpd/**'
+      - 'configure_ntpd.yml'
+      - 'inventory/group_vars/pihole/ntp.yml'
 
 jobs:
   run-configure-ntpd:

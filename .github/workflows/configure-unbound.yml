@@ -5,6 +5,8 @@ on:
       - main
     paths:
       - 'roles/configure_unbound/templates/**'
+      - 'configure_unbound.yml'
+      - 'inventory/group_vars/pihole/unbound.yml'
 
 jobs:
   run-configure-unbound:

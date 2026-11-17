@@ -5,6 +5,8 @@ on:
       - main
     paths:
       - 'roles/configure_log_rotation/**'
+      - 'inventory/group_vars/pihole/journalctl.yml'
+      - 'configure_log_rotation.yml'
 
 jobs:
   run-configure-log-rotation:

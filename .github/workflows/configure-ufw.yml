@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - 'roles/configure_ufw/tasks/**'
+      - 'configure_ufw.yml'
 
 jobs:
   run-configure-ufw:
