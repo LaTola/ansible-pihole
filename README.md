@@ -13,7 +13,7 @@ Ansible automation for an Orange Pi Zero 3 running Armbian as a small DNS and ti
 - UFW with LAN-only access to SSH, DNS, HTTP, and NTP
 - chrony or ntp, optionally serving time to the LAN
 - root cron jobs for Pi-hole updates and database maintenance
-- logrotate, systemd-tmpfiles, and journald limits for a low-resource device
+- logrotate policies, systemd-tmpfiles cleanup, and journald limits for a low-resource device
 - Pi-hole Teleporter backup and restore
 - helper playbooks to start, stop, or restart the DNS stack
 
@@ -40,6 +40,7 @@ ansible-galaxy collection install community.general ansible.posix ansible.utils
 - A Debian/Armbian-style system using APT and systemd
 - A remote account that can become root with sudo
 - Internet access for APT, the Pi-hole installer, Unbound root hints, and gravity updates
+- `cron` and `/usr/sbin/logrotate` available on the target
 - A static IPv4 address is strongly recommended
 
 ## Configure the target
@@ -78,7 +79,7 @@ Provision the complete stack:
 ansible-playbook setup_all.yml
 ```
 
-The aggregate playbook runs Unbound installation/configuration, Pi-hole installation, Teleporter restore, cron configuration, UFW, NTP, and log maintenance. Some work is repeated by the current composition: `install_pihole.yml` already includes restore and cron roles, after which `setup_all.yml` imports the standalone restore and cron playbooks again.
+The aggregate playbook runs Unbound installation/configuration, Pi-hole installation, Teleporter restore, cron configuration, UFW, NTP, and log maintenance. Each stage is imported once and the individual playbooks remain independently usable.
 
 Run a single area when making a targeted change:
 
@@ -108,12 +109,12 @@ The start order is Unbound then `pihole-FTL`; stop and restart operations shut d
 |---|---|
 | [setup_all.yml](setup_all.yml) | Runs the complete sequence described above |
 | [install_unbound.yml](install_unbound.yml) | Installs Unbound, DNS utilities, and the selected NTP package, then fully configures Unbound |
-| [install_pihole.yml](install_pihole.yml) | Installs Pi-hole when `pihole-meta` is absent, then runs restore and cron configuration |
+| [install_pihole.yml](install_pihole.yml) | Installs Pi-hole when `pihole-meta` is absent |
 | [configure_unbound.yml](configure_unbound.yml) | Rebuilds `unbound.conf.d`, downloads root hints, validates the configuration, initializes control certificates, and restarts the DNS services when changed |
 | [configure_ufw.yml](configure_ufw.yml) | Sets deny-incoming/allow-outgoing defaults and enables LAN rules for TCP 22, TCP/UDP 53, TCP 80, and UDP 123 |
 | [configure_ntpd.yml](configure_ntpd.yml) | Installs and configures the selected `chrony` or `ntp` service |
 | [configure_cron.yml](configure_cron.yml) | Installs the FTL optimization script and replaces root's complete crontab |
-| [configure_log_rotation.yml](configure_log_rotation.yml) | Installs Pi-hole logrotate, tmpfiles cleanup, and journald resource-limit configuration, then restarts journald |
+| [configure_log_rotation.yml](configure_log_rotation.yml) | Validates and deploys application/system logrotate fragments, tmpfiles cleanup, and journald resource limits, then restarts journald |
 | [backup_pihole.yml](backup_pihole.yml) | Generates a Teleporter archive on the target, fetches it into the role's files directory, and removes the target-side temporary archive |
 | [restore_pihole.yml](restore_pihole.yml) | If the local archive exists, replaces `/etc/hosts`, installs the Unbound systemd dependency, imports the archive, and rebuilds gravity |
 | [start_all.yml](start_all.yml) | Starts and enables Unbound and `pihole-FTL` when their service units exist |
@@ -148,8 +149,6 @@ The restore role silently skips its restore block when the archive is absent. Wh
 
 | Time | Job |
 |---|---|
-| Daily 01:00 | Delete `.backup` logs older than seven days under `/var/log` |
-| Monday 01:30 | Delete `.backup` files older than seven days under `/var/log.hdd` |
 | Daily 02:00 | Update Pi-hole |
 | Monday 03:00 | Stop FTL, integrity-check/VACUUM/optimize its SQLite databases, and restart FTL |
 | Daily 04:00 | Update gravity |
@@ -162,6 +161,7 @@ Times use the target host's timezone.
 - `pihole.default_webpassword`, currently `admin`, is a transient bootstrap setting used only for a fresh installation. The Teleporter restore overwrites it with the password from the archive.
 - Unbound listens only on loopback at port 5335. Its templates are tuned for a 1 GB ARM board and recreate `/etc/unbound/unbound.conf.d` on every configuration run.
 - The default journald configuration is volatile, limited to 32 MB, and uncompressed. The tmpfiles policy clears `/tmp` and `/var/tmp` entries after seven days.
+- Logrotate fragments cover Pi-hole, rsyslog, UFW, chrony, APT, dpkg, unattended upgrades, Armbian's hardware monitor, alternatives, `btmp`, `wtmp`, and `wtmp.db`. They rotate daily with seven-day maximum age plus per-log size and retention limits, including matching `/var/log.hdd` paths.
 - UFW is enabled while rules are applied. Ensure `lan.network` includes the controller before running the firewall playbook or SSH access can be lost.
 
 ## GitHub Actions
