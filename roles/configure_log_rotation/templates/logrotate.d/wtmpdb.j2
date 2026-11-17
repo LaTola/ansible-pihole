@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+/var/log/wtmp.db
+/var/log.hdd/wtmp.db
+{
+	daily
+	rotate 3
+	maxage 7
+	maxsize 2M
+	compress
+	missingok
+	notifempty
+	create
+}

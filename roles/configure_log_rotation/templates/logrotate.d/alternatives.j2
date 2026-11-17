@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+/var/log/alternatives.log
+/var/log.hdd/alternatives.log
+{
+	daily
+	rotate 3
+	maxage 7
+	maxsize 2M
+	compress
+	missingok
+	notifempty
+	create 644 root root
+}

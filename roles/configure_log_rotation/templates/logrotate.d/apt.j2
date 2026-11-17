@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+/var/log/apt/term.log
+/var/log/apt/history.log
+/var/log.hdd/apt/term.log
+/var/log.hdd/apt/history.log
+{
+	daily
+	rotate 3
+	maxage 7
+	maxsize 2M
+	compress
+	missingok
+	notifempty
+}

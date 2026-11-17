@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+/var/log/ufw.log
+/var/log.hdd/ufw.log
+{
+	daily
+	rotate 5
+	maxage 7
+	maxsize 10M
+	missingok
+	notifempty
+	compress
+	delaycompress
+	sharedscripts
+	postrotate
+		[ -x /usr/lib/rsyslog/rsyslog-rotate ] && /usr/lib/rsyslog/rsyslog-rotate || true
+	endscript
+}

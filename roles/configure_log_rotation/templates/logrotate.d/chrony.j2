@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+/var/log/chrony/*.log
+/var/log.hdd/chrony/*.log
+{
+	daily
+	rotate 3
+	maxage 7
+	maxsize 2M
+	compress
+	missingok
+	notifempty
+	nocreate
+	sharedscripts
+	postrotate
+		/usr/bin/chronyc cyclelogs > /dev/null 2>&1 || true
+	endscript
+}

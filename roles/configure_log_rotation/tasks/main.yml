@@ -73,29 +73,32 @@
         group: root
         mode: '0644'
 
-    - name: Push logrotate configuration for Pi-hole logs
+    - name: Deploy logrotate.d config templates
       ansible.builtin.template:
-        src: pihole.j2
-        dest: "{{ pihole.logrotate.config_dir }}/{{ pihole.logrotate.config_file }}"
+        src: "{{ item }}"
+        dest: "{{ pihole.logrotate.config_dir }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
+        validate: "/usr/sbin/logrotate -d %s"
+      with_fileglob:
+        - "templates/logrotate.d/*.j2"
 
     - name: Reload systemd
       ansible.builtin.systemd:
         daemon_reload: true
 
-    - name: Ensure journalctl custom config directory exists
+    - name: Ensure directory {{ journalctl.config_dir }}
       ansible.builtin.file:
         path: "{{ journalctl.config_dir }}"
         state: directory
         owner: root
         group: root
-        mode: '0755'
+        mode: '0644'
 
     - name: Push systemd journal configuration for log rotation
       ansible.builtin.template:
-        src: 00-arm-optimized.conf.j2
+        src: journald.conf.d/00-arm-optimized.conf.j2
         dest: "{{ journalctl.config_dir }}/{{ journalctl.config_file }}"
         owner: root
         group: root

@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+/var/log/pihole/*.log
+/var/log.hdd/pihole/*.log
+{
+	daily
+	rotate 5
+	maxage 7
+	maxsize 20M
+	compress
+	delaycompress
+	missingok
+	notifempty
+	sharedscripts
+	postrotate
+		/usr/lib/rsyslog/rsyslog-rotate
+	endscript
+}

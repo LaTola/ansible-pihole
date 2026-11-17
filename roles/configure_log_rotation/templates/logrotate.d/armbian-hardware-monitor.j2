@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+/var/log/armbian-hardware-monitor.log
+/var/log.hdd/armbian-hardware-monitor.log
+{
+	daily
+	rotate 3
+	maxage 7
+	maxsize 5M
+	compress
+	missingok
+	notifempty
+}

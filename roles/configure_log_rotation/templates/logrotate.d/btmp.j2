@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+/var/log/btmp
+/var/log.hdd/btmp
+{
+	daily
+	rotate 3
+	maxage 7
+	maxsize 2M
+	compress
+	missingok
+	notifempty
+	create 0660 root utmp
+}

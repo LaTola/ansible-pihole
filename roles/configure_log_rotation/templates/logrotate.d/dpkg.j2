@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+/var/log/dpkg.log
+/var/log.hdd/dpkg.log
+{
+	daily
+	rotate 3
+	maxage 7
+	maxsize 2M
+	compress
+	missingok
+	notifempty
+	create 644 root root
+}

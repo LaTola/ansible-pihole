@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+/var/log/unattended-upgrades/unattended-upgrades.log
+/var/log/unattended-upgrades/unattended-upgrades-dpkg.log
+/var/log/unattended-upgrades/unattended-upgrades-shutdown.log
+/var/log.hdd/unattended-upgrades/unattended-upgrades.log
+/var/log.hdd/unattended-upgrades/unattended-upgrades-dpkg.log
+/var/log.hdd/unattended-upgrades/unattended-upgrades-shutdown.log
+{
+	daily
+	rotate 3
+	maxage 7
+	maxsize 2M
+	compress
+	missingok
+	notifempty
+}
