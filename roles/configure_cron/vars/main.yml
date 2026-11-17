@@ -18,16 +18,4 @@ configure_cron_jobs:
     hour: "02"
     command: "{{ pihole.bin_dir }}/pihole -up > /var/log/pihole/piholeUpdate.log 2>&1"
 
-  - name: "Clear old .backup logs on /var/log"
-    minute: "00"
-    hour: "01"
-    weekday: "1"
-    command: "find /var/log -name '*.backup' -mtime +7 -delete"
-
-  - name: "Clear old .backup files on /var/log.hdd"
-    minute: "30"
-    hour: "01"
-    weekday: "1"
-    command: "find /var/log.hdd -name '*.backup' -mtime +7 -delete"
-
 configure_cron_scripts_root: "/root/.local/bin"

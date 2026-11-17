@@ -6,4 +6,3 @@
 
   roles:
     - role: restore_pihole
-    - role: configure_cron
