@@ -33,10 +33,10 @@
 
     - name: Create Unbound configuration directory (if not exists)
       ansible.builtin.file:
-        path: "{{ unbound_daemon_config_dir | default('/etc/unbound/unbound.conf.d') }}"
+        path: "{{ unbound.daemon_config_dir | default('/etc/unbound/unbound.conf.d') }}"
         state: directory
-        owner: "{{ unbound_user }}"
-        group: "{{ unbound_group }}"
+        owner: "{{ unbound.user }}"
+        group: "{{ unbound.group }}"
         mode: "0755"
 
     - name: Enable Unbound service (if not already enabled)

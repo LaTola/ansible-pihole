@@ -33,7 +33,7 @@
 
     # setupVars.conf is required for the Pi-hole installer to run in non-interactive mode.
     # It will be created with default values and the web password will be set to the value of
-    # pihole_default_webpassword. Later this confiuration is meant to be overwritten by
+    # pihole.default_webpassword. Later this configuration is meant to be overwritten by
     # the teleporter file during the restore process.
     - name: Create Pi-hole setupVars.conf
       ansible.builtin.copy:

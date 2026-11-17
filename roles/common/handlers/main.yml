@@ -17,10 +17,10 @@
     service_action: restart
     service_daemon_reload: true
 
-- name: "Restart {{ ntp_package }}"
+- name: "Restart {{ ntp.package }}"
   ansible.builtin.include_tasks: ../tasks/manage_service.yml
   vars:
-    service_name: "{{ ntp_package }}"
+    service_name: "{{ ntp.package }}"
     service_state: restarted
     service_action: restart
     service_daemon_reload: true

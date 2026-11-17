@@ -17,14 +17,14 @@
 
     - name: Ensure pihole-FTL service override directory exists
       ansible.builtin.file:
-        path: "{{ systemd_unit_dir }}/pihole-FTL.service.d"
+        path: "{{ systemd.unit_dir }}/pihole-FTL.service.d"
         state: directory
         mode: "0644"
 
     - name: Copy pihole-FTL service override configuration files
       ansible.builtin.template:
         src: "{{ item }}.j2"
-        dest: "{{ systemd_unit_dir }}/pihole-FTL.service.d/{{ item | basename }}"
+        dest: "{{ systemd.unit_dir }}/pihole-FTL.service.d/{{ item | basename }}"
         mode: "0644"
       loop:
         - "templates/99-unbound-dependency.conf"
@@ -65,13 +65,13 @@
 
     - name: Remove pihole teleporter file
       ansible.builtin.file:
-        path: "{{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
+        path: "{{ pihole.teleporter.dest }}/{{ pihole.teleporter.filename }}"
         state: absent
 
     - name: Wait for gravity update to complete
       ansible.builtin.async_status:
         jid: "{{ restore_pihole_gravity_update.ansible_job_id }}"
       register: restore_pihole_gravity_update_status
-      until: pihole_gravity_update_status.finished
+      until: restore_pihole_gravity_update_status.finished
       retries: 100
       delay: 10
