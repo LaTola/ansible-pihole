@@ -19,7 +19,7 @@
         name: ufw
         state: present
 
-    - name: Set global default firewall policies
+    - name: Set global default firewall policies  # noqa: args[module]
       community.general.ufw:
         direction: '{{ item.direction }}'
         policy: '{{ item.policy }}'
