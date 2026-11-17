@@ -21,27 +21,23 @@
 
     - name: Install prerequisite packages
       ansible.builtin.apt:
-        name:
-          - curl
-          - git
-          - netcat-openbsd
-          - sqlite3
-          - dnsutils
+        name: "{{ item }}"
         state: present
+      loop: "{{ pihole.packages }}"
 
-    - name: "Ensure {{ pihole_root_dir }} directory exists"
+    - name: "Ensure {{ pihole.root_dir }}"
       ansible.builtin.file:
-        path: "{{ pihole_root_dir }}"
+        path: "{{ pihole.root_dir }}"
         state: directory
         mode: "0755"
 
-    # setupVars.conf is required for the Pi-hole installer to run in non-interactive mode. 
-    # It will be created with default values and the web password will be set to the value of 
-    # pihole_default_webpassword. Later this confiuration is meant to be overwritten by 
+    # setupVars.conf is required for the Pi-hole installer to run in non-interactive mode.
+    # It will be created with default values and the web password will be set to the value of
+    # pihole_default_webpassword. Later this confiuration is meant to be overwritten by
     # the teleporter file during the restore process.
     - name: Create Pi-hole setupVars.conf
       ansible.builtin.copy:
-        dest: "{{ pihole_root_dir }}/setupVars.conf"
+        dest: "{{ pihole.root_dir }}/setupVars.conf"
         content: |
           PIHOLE_INTERFACE={{ host_interface }}
           IPV4_ADDRESS={{ ansible_host }}/24
@@ -62,7 +58,7 @@
           API_EXCLUDE_CLIENTS=
           API_QUERY_LOG_SHOW=all
           API_PRIVACY_MODE=false
-          WEBPASSWORD={{ pihole_default_webpassword | hash('sha256') }}
+          WEBPASSWORD={{ pihole.default_webpassword | hash('sha256') }}
         mode: "0644"
         owner: root
         group: root
@@ -75,7 +71,7 @@
 
     - name: Run the Pi-hole installer in non-interactive mode
       ansible.builtin.shell: |
-        /tmp/pi-hole-installer.sh --unattended --web-password "{{ pihole_default_webpassword }}"
+        /tmp/pi-hole-installer.sh --unattended --web-password "{{ pihole.default_webpassword }}"
       environment:
         TERM: xterm-256color
       changed_when: true

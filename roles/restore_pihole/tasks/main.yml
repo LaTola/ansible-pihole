@@ -1,13 +1,13 @@
 ---
 - name: Check if teleporter file exists
   ansible.builtin.stat:
-    path: "files/{{ pihole_teleporter_filename }}"
-  register: teleporter_file
+    path: "files/{{ pihole.teleporter.filename }}"
+  register: restore_pihole_teleporter_file
 
 - name: Restore pi-hole
   become: true
   become_method: ansible.builtin.sudo
-  when: teleporter_file.stat.exists
+  when: restore_pihole_teleporter_file.stat.exists
   block:
     - name: Template /etc/hosts file
       ansible.builtin.template:
@@ -31,8 +31,8 @@
 
     - name: Copy pihole teleporter file
       ansible.builtin.copy:
-        src: "files/{{ pihole_teleporter_filename }}"
-        dest: "{{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
+        src: "files/{{ pihole.teleporter.filename }}"
+        dest: "{{ pihole.teleporter.dest }}/{{ pihole.teleporter.filename }}"
         mode: "0644"
 
     - name: Import pihole teleporter file
@@ -40,9 +40,9 @@
         argv:
           - pihole-FTL
           - --teleporter
-          - "{{ pihole_teleporter_dest }}/{{ pihole_teleporter_filename }}"
-      register: pihole_import
-      changed_when: pihole_import.rc != 0 
+          - "{{ pihole.teleporter.dest }}/{{ pihole.teleporter.filename }}"
+      register: restore_pihole_import
+      changed_when: restore_pihole_import.rc != 0
 
     - name: Update gravity DB
       become: true
@@ -50,18 +50,18 @@
         argv:
           - pihole
           - -g
-      register: pihole_gravity_update
+      register: restore_pihole_gravity_update
       async: 1200
       poll: 0
 
     - name: Wait for gravity DB update to complete
       ansible.builtin.async_status:
-        jid: "{{ pihole_gravity_update.ansible_job_id }}"
-      register: gravity_job_result
-      until: gravity_job_result.finished
+        jid: "{{ restore_pihole_gravity_update.ansible_job_id }}"
+      register: restore_pihole_gravity_job_result
+      until: restore_pihole_gravity_job_result.finished
       retries: 40
       delay: 30
-      changed_when: gravity_job_result.rc == 0
+      changed_when: restore_pihole_gravity_job_result.rc == 0
 
     - name: Remove pihole teleporter file
       ansible.builtin.file:
@@ -70,8 +70,8 @@
 
     - name: Wait for gravity update to complete
       ansible.builtin.async_status:
-        jid: "{{ pihole_gravity_update.ansible_job_id }}"
-      register: pihole_gravity_update_status
+        jid: "{{ restore_pihole_gravity_update.ansible_job_id }}"
+      register: restore_pihole_gravity_update_status
       until: pihole_gravity_update_status.finished
       retries: 100
       delay: 10

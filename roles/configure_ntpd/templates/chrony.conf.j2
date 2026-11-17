@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 # /etc/chrony/chrony.conf
 # NTP sources - South America pool
-pool {{ ntp_pool }} iburst maxsources 4
+pool {{ ntp.pool }} iburst maxsources 4
 
 # Drift file to track clock frequency error
 driftfile /var/lib/chrony/drift
@@ -17,4 +17,4 @@ logchange 0.5
 logdir /var/log/chrony
 
 # Allow NTP client access from local network (uncomment if serving LAN)
-allow {{ lan_network }}
+allow {{ lan.network }}

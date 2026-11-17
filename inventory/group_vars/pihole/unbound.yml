@@ -1,0 +1,13 @@
+---
+
+## Unbound configuration variables
+unbound:
+  config_dir: "/etc/unbound"
+  daemon_config_dir: "{{ unbound.config_dir }}/unbound.conf.d"
+  user: "unbound"
+  group: "unbound"
+  root_hints_dir: "/usr/share/dns"
+  packages:
+    - "{{ ntp.package }}"
+    - unbound
+    - dnsutils

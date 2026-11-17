@@ -5,7 +5,7 @@ configure_cron_jobs:
   - name: "Update Gravity"
     minute: "00"
     hour: "04"
-    command: "{{ pihole_bin_dir }}/pihole -g"
+    command: "{{ pihole.bin_dir }}/pihole -g"
 
   - name: "Optimize FTL Database"
     hour: "03"
@@ -16,7 +16,7 @@ configure_cron_jobs:
   - name: "Update Pi-hole"
     minute: "00"
     hour: "02"
-    command: "{{ pihole_bin_dir }}/pihole -up > /var/log/pihole/piholeUpdate.log 2>&1"
+    command: "{{ pihole.bin_dir }}/pihole -up > /var/log/pihole/piholeUpdate.log 2>&1"
 
   - name: "Clear old .backup logs on /var/log"
     minute: "00"

@@ -1,0 +1,20 @@
+---
+## pi-hole configuration variables
+pihole:
+  root_dir: "/etc/pihole"
+  teleporter:
+    filename: "pihole_teleporter.zip"
+    vault: "roles/restore_pihole/files"
+    dest: "/tmp"
+  default_webpassword: "admin"
+  bin_dir: "/usr/local/bin"
+  logrotate:
+    config_dir: "/etc/logrotate.d"
+    config_file: "pihole"
+    days: 2
+  packages:
+    - curl
+    - git
+    - netcat-openbsd
+    - sqlite3
+    - dnsutils

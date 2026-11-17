@@ -10,25 +10,25 @@
     - name: Upload unbound.conf file
       ansible.builtin.template:
         src: unbound.conf.j2
-        dest: "{{ unbound_config_dir }}/unbound.conf"
-        owner: "{{ unbound_user }}"
-        group: "{{ unbound_group }}"
+        dest: "{{ unbound.config_dir }}/unbound.conf"
+        owner: "{{ unbound.user }}"
+        group: "{{ unbound.group }}"
         mode: "0640"
 
     - name: Download root.hints file
       ansible.builtin.get_url:
         url: https://www.internic.net/domain/named.cache
-        dest: "{{ unbound_config_dir }}/root.hints"
-        owner: "{{ unbound_user }}"
-        group: "{{ unbound_group }}"
+        dest: "{{ unbound.config_dir }}/root.hints"
+        owner: "{{ unbound.user }}"
+        group: "{{ unbound.group }}"
         mode: '0640'
 
     - name: Rebuild configuration directory unbound.conf.d
       ansible.builtin.file:
-        path: "{{ unbound_config_dir }}/unbound.conf.d"
+        path: "{{ unbound.daemon_config_dir }}"
         state: "{{ item }}"
-        owner: "{{ unbound_user }}"
-        group: "{{ unbound_group }}"
+        owner: "{{ unbound.user }}"
+        group: "{{ unbound.group }}"
         mode: "0750"
       loop:
         - absent
@@ -37,9 +37,9 @@
     - name: Upload unbound.conf.d configuration files
       ansible.builtin.template:
         src: "{{ item }}"
-        dest: "{{ unbound_config_dir }}/unbound.conf.d/{{ item | basename | regex_replace('\\.j2$', '') }}"
-        owner: "{{ unbound_user }}"
-        group: "{{ unbound_group }}"
+        dest: "{{ unbound.config_dir }}/unbound.conf.d/{{ item | basename | regex_replace('\\.j2$', '') }}"
+        owner: "{{ unbound.user }}"
+        group: "{{ unbound.group }}"
         mode: "0640"
       with_fileglob:
         - "templates/unbound.conf.d/*.conf.j2"

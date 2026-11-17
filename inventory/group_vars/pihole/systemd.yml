@@ -1,0 +1,11 @@
+---
+## Systemd variables
+systemd:
+  unit_dir: "/etc/systemd/system"
+  tmpfiles:
+    config_dir: "/etc/tmpfiles.d"
+    config_file: "tmp.conf"
+
+## /var/tmp and /tmp maintenance configuration variables
+tmp:
+  retention_days: 7

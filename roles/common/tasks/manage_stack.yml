@@ -1,6 +1,6 @@
 ---
 # This file handles service management
-- name: "Perform {{ action_type }} operation on DNS stack"
+- name: "Perform DNS stack {{ action_type }}"
   ansible.builtin.service:
     name: "{{ item.name }}"
     state: "{{ item.state }}"

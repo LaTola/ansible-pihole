@@ -3,13 +3,13 @@
   become: true
   become_method: ansible.builtin.sudo
   block:
-    - name: Generate pihole teleporter file
+    - name: "Generate pihole teleporter file"
       ansible.builtin.command:
         argv:
           - pihole-FTL
           - --teleporter
       args:
-        chdir: "{{ pihole_teleporter_dest }}"
+        chdir: "{{ pihole.teleporter.dest }}"
       register: pihole_export
       changed_when: pihole_export.rc != 0
 
@@ -19,12 +19,12 @@
 
     - name: Fetch pihole teleporter file
       ansible.builtin.fetch:
-        src: "{{ pihole_teleporter_dest }}/{{ pihole_export.stdout }}"
-        dest: "{{ pihole_teleporter_vault }}/{{ pihole_teleporter_filename }}"
+        src: "{{ pihole.teleporter.dest }}/{{ pihole_export.stdout }}"
+        dest: "{{ pihole.teleporter.vault }}/{{ pihole.teleporter.filename }}"
         flat: true
       register: pihole_fetch
 
     - name: Remove pihole teleporter file
       ansible.builtin.file:
-        path: "{{ pihole_teleporter_dest }}/{{ pihole_export.stdout }}"
+        path: "{{ pihole.teleporter.dest }}/{{ pihole_export.stdout }}"
         state: absent

@@ -1,5 +1,5 @@
 ---
-- name: Configure RPI crontab
+- name: Configure pihole crontab
   hosts: pihole
   gather_facts: false
 

@@ -1,0 +1,17 @@
+---
+## journalctl retention configuration variables for low resources arm based devices
+## this is the configuration for jinja2 template 00-arm-optimized.conf.j2
+
+journalctl:
+  config_dir: "/etc/systemd/journald.conf.d"
+  config_file: "00-arm-optimized.conf"
+  storage: "volatile"
+  max_use: "32M"
+  max_file_size: "8M"
+  compress: "no"
+  rate_limit:
+    interval: "30s"
+    burst: 200
+  audit: "no"
+  ForwardToWall: "no"
+  ForwardToSyslog: "no"

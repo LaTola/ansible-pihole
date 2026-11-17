@@ -1,38 +1,38 @@
 ---
-- name: "Configure {{ ntp_package }} as NTPD"
-  when: ntp_package == "ntp"
+- name: "Setup NTP package: {{ ntp.package }}"
+  when: ntp.package == "ntp"
   become: true
   become_method: ansible.builtin.sudo
   block:
-    - name: Ensure {{ ntp_package }} (ntp)is installed
+    - name: "Ensure NTP package is installed: {{ ntp.package }}"
       ansible.builtin.package:
         name: ntp
         state: present
 
-    - name: Configure {{ ntp_package }}
+    - name: "Configure {{ ntp.package }}"
       ansible.builtin.template:
         src: templates/ntp.conf.j2
         dest: /etc/ntp.conf
         owner: root
         group: root
         mode: '0644'
-      notify: Restart {{ ntp_package }}
+      notify: Restart {{ ntp.package }}
 
-- name: "Configure {{ ntp_package }} (chrony) as NTPD"
-  when: ntp_package == "chrony"
+- name: "Setup NTP package: {{ ntp.package }}"
+  when: ntp.package == "chrony"
   become: true
   become_method: ansible.builtin.sudo
   block:
-    - name: Ensure {{ ntp_package }} is installed
+    - name: "Ensure NTP package is installed: {{ ntp.package }}"
       ansible.builtin.package:
-        name: "{{ ntp_package }}"
+        name: "{{ ntp.package }}"
         state: present
 
-    - name: Configure {{ ntp_package }}
+    - name: "Configure {{ ntp.package }}"
       ansible.builtin.template:
-        src: "templates/{{ ntp_package }}.conf.j2"
-        dest: "/etc/{{ ntp_package }}/{{ ntp_package }}.conf"
+        src: "templates/{{ ntp.package }}.conf.j2"
+        dest: "/etc/{{ ntp.package }}/{{ ntp.package }}.conf"
         owner: root
         group: root
         mode: '0644'
-      notify: Restart {{ ntp_package }}
+      notify: Restart {{ ntp.package }}

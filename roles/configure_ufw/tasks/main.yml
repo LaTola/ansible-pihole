@@ -10,8 +10,8 @@
 
     - name: Set global default firewall policies
       community.general.ufw:
-        direction: "{{ item.direction }}"
-        policy: "{{ item.policy }}"
+        direction: '{{ item.direction }}'
+        policy: '{{ item.policy }}'
       loop:
         - { direction: "incoming", policy: "deny" }
         - { direction: "outgoing", policy: "allow" }
@@ -19,10 +19,10 @@
     - name: Configure ufw firewall rules
       ansible.builtin.include_tasks: roles/common/tasks/ufw.yml
       loop:
-        - { name: "Allow LAN SSH", port: 22, proto: "tcp", src: "{{ lan_network }}", rule: "allow" }
-        - { name: "Allow DNS from local network", port: 53, src: "{{ lan_network }}", rule: "allow" }
-        - { name: "Allow Pi-hole Web Dashboard", port: 80, proto: "tcp", src: "{{ lan_network }}", rule: "allow" }
-        - { name: "Enable ntp port", port: 123, proto: "udp", src: "{{ lan_network }}", rule: "allow" }
+        - { name: "Allow LAN SSH", port: 22, proto: "tcp", src: "{{ lan.network }}", rule: "allow" }
+        - { name: "Allow DNS from local network", port: 53, src: "{{ lan.network }}", rule: "allow" }
+        - { name: "Allow Pi-hole Web Dashboard", port: 80, proto: "tcp", src: "{{ lan.network }}", rule: "allow" }
+        - { name: "Enable ntp port", port: 123, proto: "udp", src: "{{ lan.network }}", rule: "allow" }
       loop_control:
         loop_var: ufw_item
 

@@ -1,0 +1,5 @@
+---
+## NTP related variables
+ntp:
+  package: "chrony"    # It can be chrony or ntp depending on the system and preference
+  pool: "south-america.pool.ntp.org"
