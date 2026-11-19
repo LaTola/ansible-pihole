@@ -1,5 +1,6 @@
 name: Deploy configure-cron Ansible Playbook
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
