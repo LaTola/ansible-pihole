@@ -17,6 +17,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check Ansible Playbook syntax
+        run: |
+          ansible-playbook configure_log_rotation.yml --syntax-check
+
       - name: Run Ansible Playbook
         run: |
           ansible-playbook configure_log_rotation.yml
